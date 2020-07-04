@@ -1,0 +1,17 @@
+# Dist
+assets/js/main.js
+
+# Dependencies
+node_modules/
+vendor/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# MISC
+.DS_Store
+.env
+config.php
+deploy.sh
