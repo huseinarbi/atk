@@ -1,0 +1,21 @@
+{
+  "short_name": "E Rapor",
+  "name": "E Rapor",
+  "description": "E Rapor",
+  "display": "standalone",
+  "orientation": "portrait",
+  "icons": [
+	{
+		"src": "/images/touch/android-icon-192x192.png",
+		"sizes": "192x192",
+		"type": "image/png"
+	},
+  {
+    "src": "/images/touch/ms-icon-310x310.png",
+    "sizes": "310x310",
+    "type": "image/png"
+  }],
+  "start_url": "/index.html?utm_source=homescreen",
+  "theme_color": "#20b983",
+  "background_color": "#eee8de"
+}

@@ -1,0 +1,121 @@
+.file-drop-area {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 450px;
+  max-width: 100%;
+  padding: 25px;
+  border: 1px dashed hsl(0, 0%, 81%);
+  border-radius: 3px;
+  transition: 0.2s;
+  &.is-active {
+    border-color: #2dce89;
+  }
+}
+
+.fake-btn {
+  flex-shrink: 0;
+  background-color: rgba(255, 255, 255, 0.04);
+  border: 1px dashed hsl(0, 0%, 81%);
+  border-radius: 3px;
+  padding: 8px 15px;
+  margin-right: 10px;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.file-msg {
+  font-size: small;
+  font-weight: 300;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.file-input {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  cursor: pointer;
+  opacity: 0;
+  &:focus {
+    outline: none;
+  }
+}
+
+#import-xlsx {
+  .modal-body {
+    padding-top: 0;
+  }
+  .modal-footer,
+  #workbook {
+    display: none;
+  }
+
+  .modal-footer {
+    padding-top: 0;
+  }
+
+  &.loaded {
+    .modal-dialog {
+      max-width: 90%;
+    }
+
+    .modal-footer,
+    #workbook {
+      display: block;
+    }
+
+    .file-drop-area {
+      display: none;
+    }
+  }
+}
+
+#workbook {
+  table {
+    width: 100%;
+    border-collapse: collapse;
+
+    tr:nth-of-type(odd) {
+      background: #f9f9f9;
+    }
+
+    td, th {
+      padding: 10px;
+      border: 1px solid #efefef;
+      text-align: left;
+      font-size: 12px;
+    }
+
+    @media screen and (max-width: 600px) {
+      border: 0;
+
+      thead {
+        display: none;
+      }
+
+      tr {
+        margin-top: 10px;
+        display: block;
+        background: #f9f9f9;
+      }
+
+      td {
+        display: block;
+        text-align: left;
+        font-size: 13px;
+        border-bottom: 1px dotted #ccc;
+        border-top: none;
+        border-right: none;
+
+        &:last-child {
+          border-bottom: 0;
+        }
+      }
+    }
+  }
+}

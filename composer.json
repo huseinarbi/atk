@@ -1,0 +1,12 @@
+{
+    "require": {
+        "mikecao/flight": "^1.3",
+        "tommyknocker/pdo-database-class": "^1.1",
+        "delight-im/auth": "^8.2"
+    },
+    "autoload": {
+        "files": [
+        	"includes/functions.php"
+        ]
+    }
+}
