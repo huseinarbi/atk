@@ -18,8 +18,8 @@ abstract class ATK_Route {
     
     public function __construct() {
         
-        $this->db   = new ATK_Db();
-        $this->auth = $this->getRoutes();
+        $this->db		= new ATK_Db();
+        $this->routes 	= $this->getRoutes();
 
         Flight::before( 'start', array( $this, 'checkLogin' ) );
 		Flight::route( '/login', array( $this, 'handleLogin' ) );
