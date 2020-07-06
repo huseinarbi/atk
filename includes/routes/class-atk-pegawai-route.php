@@ -7,7 +7,7 @@
  * @author huseinarbi <huseinarbi66@gmail.com>
  */
 
-class ATK_Admin_Route extends ATK_Route {
+class ATK_Pegawai_Route extends ATK_Route {
 
     public function handleDashboard() {
 

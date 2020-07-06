@@ -28,11 +28,6 @@
 				<a class="navbar-brand pt-0" href="<?php echo get_url(); ?>">
 					<img src="<?php asset_url( 'img/brand/blue.png' );?>" class="navbar-brand-img" style="max-height: 3rem!important;" alt="...">
 				</a>
-				
-				<a class="navbar-brand pt-0" style="display:flex;" href="<?php echo get_url(); ?>">
-					<img src="<?php asset_url( 'img/theme/logo-man.png' );?>" class="navbar-brand-img" style="max-height: 2.5rem!important;" alt="...">
-					<h3 class="mb-0" style="margin-top:7px; margin-left:4px;color:rgba(0,0,0,.5);">MAN 1 Magelang</h3>
-				</a>
 				<!-- User -->
 				<ul class="nav align-items-center d-md-none">
 					<li class="nav-item dropdown">

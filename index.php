@@ -35,6 +35,19 @@ Flight::map( 'user', function( $key = false ){
 	return isset( $userdata[ $key ] ) ? $userdata[ $key ] : null;
 });
 
+Flight::map( 'role', function() {
+	$auth     	= Flight::auth();
+	$roles 		= $auth->getRoles();
+	
+	foreach ($roles as $key => $role) {
+		if ( $role == 'MODERATOR' ) {
+			return 'PEGAWAI';
+		} else {
+			return 'ADMIN';
+		}
+	}
+} );
+
 /**
  * Scan directory and load it
  *
@@ -69,9 +82,9 @@ switch ( $roles ) {
 	case 'ADMIN':
 	case 'SUPER_ADMIN':
 		new ATK_Admin_Route();
-		break;
+        break;
 	default:
-		new ATK_Admin_Route();
+		new ATK_Pegawai_Route();
 		break;
 }
 
