@@ -5,7 +5,7 @@
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<title>
-		SIM Pengolahan Nilai Siswa - MAN 1 Magelang
+		Sistem Pengolahan Informasi
 	</title>
 	<!-- Favicon -->
 	<link href="<?php asset_url('img/brand/favicon.png'); ?>" rel="icon" type="image/png">
@@ -27,7 +27,7 @@
 				<div class="header-body text-center mb-5">
 					<div class="row justify-content-center">
 						<div class="col-lg-5 col-md-6">
-							<h1 class="text-white">Sistem Informasi Manajemen<br>Pengolahan Nilai Siswa<br>MAN 1 Magelang</h1>
+							<h1 class="text-white">Sistem Informasi<br>Title<br>Sub Title</h1>
 							<p class="text-lead text-light">Silahkan masukkan username dan password anda untuk masuk aplikasi.</p>
 						</div>
 					</div>
@@ -92,7 +92,7 @@
 		</div>
 		<div class="text-center">
 			<div>
-				<p class="text-lead text-light"><small><i>- Edited by Danang H -</small></i></p>
+				<p class="text-lead text-light"><small><i>- Edited by Husein Arbi -</small></i></p>
 			</div>
 		</div>
 	</div>

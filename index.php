@@ -65,7 +65,7 @@ require_all_files( 'includes' );
  * @var [type]
  */
 $roles = Flight::user('roles');
-switch ( current( $roles ) ) {
+switch ( $roles ) {
 	case 'ADMIN':
 	case 'SUPER_ADMIN':
 		new ATK_Admin_Route();

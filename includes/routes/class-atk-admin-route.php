@@ -8,6 +8,11 @@
  */
 
 class ATK_Admin_Route extends ATK_Route {
+
+    public function handleDashboard() {
+        echo 'dashboard'; exit();
+    }
+
     public function getRoutes() {
         return array(
 			array(
