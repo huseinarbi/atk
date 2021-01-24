@@ -16,7 +16,7 @@ $db = new PDO ( 'mysql:host='. DB_HOST .';dbname=' . DB_NAME, DB_USER, DB_PASS )
 Flight::register( 'db', 'PDODb', array( $db ) );
 Flight::register( 'auth', '\Delight\Auth\Auth', array( $db ) );
 
-Flight::map( 'user', function( $key = false ){
+Flight::map( 'user', function( $key = false ) {
 	$auth     = Flight::auth();
 
 	$userdata = array(
@@ -40,13 +40,44 @@ Flight::map( 'role', function() {
 	$roles 		= $auth->getRoles();
 	
 	foreach ($roles as $key => $role) {
-		if ( $role == 'MODERATOR' ) {
-			return 'PEGAWAI';
-		} else {
+		if ( $role == 'SUPER_ADMIN' ) {
 			return 'ADMIN';
+		} else {
+			return 'PEGAWAI';
 		}
 	}
 } );
+
+
+/**
+ * Set message to session
+ *
+ * @var string
+ */
+Flight::map( 'addMessage', function( $message, $type = 'error' ){
+	if ( session_status() == PHP_SESSION_NONE ) {
+		session_start();
+	}
+
+	$_SESSION['message'] = array(
+		'message' => $message,
+		'type'    => $type
+	);
+});
+
+Flight::map( 'renderMessage', function( $type = 'error' ){
+	if ( !isset( $_SESSION['message'] ) || empty( $_SESSION['message'] ) ) {
+		return;
+	}
+
+	$message = $_SESSION['message'];
+	unset( $_SESSION['message'] );
+
+	Flight::render( 'partials/message', $message );
+} );
+
+// Default title
+Flight::view()->set('title', 'ATK' );
 
 /**
  * Scan directory and load it
@@ -78,8 +109,7 @@ require_all_files( 'includes' );
  * @var [type]
  */
 $roles = Flight::user('roles');
-switch ( $roles ) {
-	case 'ADMIN':
+switch ( current( $roles ) ) {
 	case 'SUPER_ADMIN':
 		new ATK_Admin_Route();
         break;
@@ -87,5 +117,5 @@ switch ( $roles ) {
 		new ATK_Pegawai_Route();
 		break;
 }
-
+new ATK_Project();
 Flight::start();

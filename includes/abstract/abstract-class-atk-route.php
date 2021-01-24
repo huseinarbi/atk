@@ -12,15 +12,18 @@ abstract class ATK_Route {
     
     protected $routes;
 
-    protected $db;
+    // protected $db;
 
     protected $need_login = true;
     
     public function __construct() {
         
-        $this->db		= new ATK_Db();
-        $this->routes 	= $this->getRoutes();
-
+		$this->users 	= new ATK_Users();
+		$this->barang	= new ATK_Barang();
+		$this->prediksi	= new ATK_Prediksi();
+		$this->laporan 	= new ATK_Laporan();
+		$this->routes 	= $this->getRoutes();
+		
         Flight::before( 'start', array( $this, 'checkLogin' ) );
 		Flight::route( '/login', array( $this, 'handleLogin' ) );
 		Flight::route( '/logout', array( $this, 'handleLogout' ) );
