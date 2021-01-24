@@ -17,7 +17,7 @@ class ATK_Db {
         $this->db       = Flight::db();
         $this->auth     = Flight::auth();
 
-        DEFINE( 'DATA_PER_PAGE', 1 );
+        // DEFINE( 'DATA_PER_PAGE', 1 );
 
     }
 
@@ -41,7 +41,7 @@ class ATK_Db {
 			}
 		}
 
-		if ( isset( $args['where'] ) ) {
+		if ( isset( $args['where'] ) && $args['where'] ) {
 			if ( is_array($args['where']) ) { //if where not primary key
 				$where = $args['where'];
 				foreach ($where as $where_key => $where_field) {
@@ -65,7 +65,7 @@ class ATK_Db {
 		}
 
 		try {
-			if ( isset($args['group_by']) ) {
+			if ( isset($args['group_by']) && ! empty( $args['group_by'] ) ) {
 				$this->db->groupBy($args['group_by']);
 			}
 
@@ -96,8 +96,15 @@ class ATK_Db {
 				'page' 		=> $page,
 				'total' 	=> $total_page
 			),
+			'last_query'	=> $this->db->getLastQuery(),
 			'error_catch' => isset($error_catch) ? $error_catch : ''
 		);
+
+		if( isset( $_REQUEST['debug'] ) ) {
+			echo '<pre>';
+			print_r($table_data);
+			exit();
+		}
 
 		return $table_data;
 	}
@@ -116,10 +123,18 @@ class ATK_Db {
 		return $options;
 	}
 
+	/**
+	 * @param array		$args 		array(
+	 * 	'data'	=> array,
+	 * 	'table'	=> string | name of table,
+	 *  'edit'	=> false  | true to edit table
+	 *  'login'	=> false  | true to create user
+	 * )
+	 * @return object   error 
+	 */
+
     public function saveData( $args = array() ) {
-
-		$error 		= '';
-
+		$error 		= array( 'error', 'id' );
 		try {
 
 			$data 	        = $args['data'];
@@ -129,11 +144,11 @@ class ATK_Db {
 
 			if ( is_array( $args['data'] ) ) {
 				foreach ($args['data'] as $field => $value) {
-					$data[$field] = !empty($value) ? $value : NULL;
+					$data[$field] = !empty($value) || $value == '0' ? $value : NULL;
 				}
 			}
 
-			if ( isset( $args['edit'] ) ) {
+			if ( isset( $args['edit'] ) && ! empty( $args['edit'] )) {
 				$edit = $args['edit'];
 
 				$this->db->where($edit['key'],$edit['key_value']);
@@ -158,6 +173,7 @@ class ATK_Db {
 					$this->db->delete('users_throttling');	
 				}
 				
+				$error['id'] = $id;
 			}
 
 			if ( !empty($this->db->getLastError()[2]) ) {
@@ -165,23 +181,55 @@ class ATK_Db {
 			}
 
 		}  catch (\Delight\Auth\InvalidEmailException $e) {
-			$error = 'Email salah.';
+			$error['error'] = 'Email salah.';
 		} catch (\Delight\Auth\UnknownUsernameException $e) {
-			$error = 'Username tidak ditemukan.';
+			$error['error'] = 'Username tidak ditemukan.';
 		} catch (\Delight\Auth\InvalidPasswordException $e) {
-			$error = 'Password salah';
+			$error['error'] = 'Password salah';
 		} catch (\Delight\Auth\EmailNotVerifiedException $e) {
-			$error = 'Email belum terverifikasi.';
+			$error['error'] = 'Email belum terverifikasi.';
 		} catch (\Delight\Auth\UserAlreadyExistsException $e) {
-			$error = 'User sudah ada.';
+			$error['error'] = 'User sudah ada.';
 		} catch (\Delight\Auth\TooManyRequestsException $e) {
-			$error = 'Terlalu banyak percobaan.';
+			$error['error'] = 'Terlalu banyak percobaan.';
 		} catch (Exception $e) {
-			$error = $e->getMessage();
+			$error['error'] = $e->getMessage();
 		}
 
 		return $error;
-    }
+	}
+	
+	public function updateData( $args = array() ) {
+		$error 		= array( 'error', 'id' );
+		$per_page 	= defined( 'DATA_PER_PAGE' ) ? DATA_PER_PAGE : 10; // perpage
+		$page     	= intval( 1 );
+		$offset   	= ( $page - 1 ) * $per_page;
+
+		echo '<pre>';
+		try {
+			$data 	        = $args['data'];
+			$table 	        = $args['table'];
+			$where 			= $args['where'];
+			
+			if ( is_array( $where ) ) {
+				foreach ( $where as $key => $where ) {
+					$this->db->where( $where['key'], $where['key_value'] );
+				}
+			}
+
+			$exist	= $this->db->withTotalCount()->get( $args['table'], array($offset, $per_page), !empty($cols) ? array_keys( $cols ) : '' );
+
+			if ( empty( $exist ) ) {
+				$id 			= $this->db->insert($table, $data);
+				$error['id'] 	= $id;
+			}
+
+		} catch (Exception $e) {
+			$error['error'] = $e->getMessage();
+		}
+
+		return $error;
+	}
 
 	public function deleteData( $args = array() ) {
 
@@ -263,3 +311,5 @@ class ATK_Db {
 
     
 }
+
+$GLOBALS['pdodb'] = new ATK_Db();

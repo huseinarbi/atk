@@ -16,7 +16,7 @@ $db = new PDO ( 'mysql:host='. DB_HOST .';dbname=' . DB_NAME, DB_USER, DB_PASS )
 Flight::register( 'db', 'PDODb', array( $db ) );
 Flight::register( 'auth', '\Delight\Auth\Auth', array( $db ) );
 
-Flight::map( 'user', function( $key = false ){
+Flight::map( 'user', function( $key = false ) {
 	$auth     = Flight::auth();
 
 	$userdata = array(
@@ -40,10 +40,10 @@ Flight::map( 'role', function() {
 	$roles 		= $auth->getRoles();
 	
 	foreach ($roles as $key => $role) {
-		if ( $role == 'MODERATOR' ) {
-			return 'PEGAWAI';
-		} else {
+		if ( $role == 'SUPER_ADMIN' ) {
 			return 'ADMIN';
+		} else {
+			return 'PEGAWAI';
 		}
 	}
 } );

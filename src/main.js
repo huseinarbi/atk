@@ -1,4 +1,5 @@
 import XLSX from 'xlsx';
+import CHART from 'chart.js';
 import $ from 'jquery';
 import { Printd } from 'printd';
 
@@ -37,6 +38,355 @@ class ATK {
     //print
     $(document).on('click', '#btn-print', this.documentPrint);
 
+    $(document).on( 'click', '#search-box', function() {
+      $('#container-list-barang').show();
+    } );
+
+    $(document).on( 'focusout', '#search-box', function( event ) {
+      $('#container-list-barang').hide('slow');
+    } );
+
+    $(document).on( 'keyup' , '#search-box', this.searchBox );
+    $(document).on( 'click', '#add-to-cart', this.addToCart );
+    // $(document).on( 'click', '#add-to-cart', this.calculateTotal );
+    $(document).on( 'change', '#jumlah-cart', this.changeTotal );
+    // $(document).addEventListener( 'keyup', '#jumlah-cart', function(e) {
+      
+      
+    //   let default_stok = $(this).attr('max');
+    //   console.log(e.target.value);
+    //   console.log(default_stok);
+    //   if (e.target.value > default_stok) {
+    //     Swal.fire({
+    //       icon    : 'error',
+    //       title   : 'Oops...',
+    //       text    : 'Stok barang sisa '+default_stok,
+    //     });
+    //     this.value = default_stok;
+    //   } else if (e.target.value.length && e.target.value <= 0) {
+    //     this.value = 1;
+    //   }
+    // });
+
+    $(document).on( 'change', '#harga-barang', this.changeTotal )
+    $(document).on( 'click', '.remove-current-item', this.remove_current_item );
+
+    $(document).on( 'click', '#btn-sumbit-save-cart', this.save_cart );
+    $(document).on( 'click', '#save-tutup-buku', this.save_tutup_buku );
+
+    $(document).on( 'change', '#date-periode-prediksi', this.changePeriode );
+
+    this.load_chart();
+    this.check_data_tutup_buku();
+  }
+
+  check_data_tutup_buku() {
+    var periode = document.getElementById( 'date-periode-tutup-buku' );
+
+    if ( periode != null ) {
+      if ( this.getParameterByName('periode') == null ) {
+        $.ajax({
+          type    : 'POST',
+          dataType: 'JSON',
+          url     : location.href,
+          data    : {
+            action      : 'check_tutup_buku'
+          },
+        })
+        .done(function(response) {
+          var queryParams = new URLSearchParams(window.location.search);
+          queryParams.set("periode", response.data );
+          history.replaceState(null, null, "?"+queryParams.toString());
+          document.location.reload();
+          console.log( response.data );
+        });
+      }
+    }
+  }
+
+  save_tutup_buku() {
+    let date  = $(document).find('#date-periode-tutup-buku').val();
+
+    Swal.fire({
+      text                : 'Apakah anda yakin akan melakukan tutup buku periode '+date+'?',
+      icon                : 'warning',
+      showCancelButton    : true,
+      reverseButtons      : true,
+      confirmButtonColor  : '#fb6340',
+      cancelButtonColor   : '#adb5bd',
+      cancelButtonText    : 'Batalkan',
+      confirmButtonText   : 'Ya, Tutup Buku!'
+    }).then((result) => {
+      if (result.value) {
+          $.ajax({
+            type        : 'POST',
+            dataType    : 'JSON',
+            url         : location.href,
+            data        : {
+              action    : 'save_tutup_buku',
+              date      : date,
+            },
+          })
+          .done(function(response) {
+            
+          });    
+      }
+    })  
+  }
+
+  getParameterByName(name, url = window.location.href) {
+    name = name.replace(/[\[\]]/g, '\\$&');
+    var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, ' '));
+  }
+
+  changePeriode() {
+    var queryParams = new URLSearchParams(window.location.search);
+    queryParams.set("periode", $(this).val());
+    history.replaceState(null, null, "?"+queryParams.toString());
+    document.location.reload();
+  }
+
+  load_chart() {
+    var ctx = document.getElementById('myChart');
+
+    if ( ctx != null ) {
+      let new_item    = [];
+      let regresi     = [];
+      var ctx         = document.getElementById('myChart').getContext('2d');
+      let pengambilan = $(document).find( '#data-chart' ).find( '#data-pengambilan' ).val();
+      let koefisien   = $(document).find( '#data-chart' ).find( '#data-koefisien' ).val();
+      let prediksi    = $(document).find( '#data-chart' ).find( '#data-prediksi' ).val();
+      
+      pengambilan     = pengambilan.split( ';' );
+      koefisien       = { 'x' : 0, 'y' : koefisien };
+
+      new_item.push(koefisien);
+      pengambilan.forEach( function( item, index, arr ) {
+          let xx = { 'x' : index+1, 'y' : item };
+          new_item.push(xx);
+      } );
+
+      regresi         = [ koefisien, { 'x' : new_item.length - 1, 'y' : prediksi } ];
+
+
+      console.log( new_item );
+      console.log(regresi);
+
+      var scatterChart = new Chart(ctx, {
+          type: 'scatter',
+          data: {
+              datasets: [{
+                  label: 'Pengambilan',
+                  data: new_item,
+                  backgroundColor: 'rgba(0, 129, 255, 0.6)',
+                  borderColor: 'rgba(54, 162, 235, 1)',
+                  borderWidth: 1
+              },{
+                label : 'Regresi',
+                type: 'line',
+                data: regresi,
+                borderColor: 'rgba(255, 99, 71, 0.8)',
+                borderDash: [5],
+                fill: false,
+              }]
+          },
+          options: {
+              scales: {
+                xAxes: [{
+                  ticks: {
+                      min: 0,
+                      stepSize: 1
+                },
+                }],
+                yAxes: [{
+                  ticks: {
+                      min: 0,
+                      stepSize: 5
+                },
+                }]
+              }
+          }
+      });
+    }
+  }
+
+  remove_current_item() {
+    $(this).closest('tr').remove();
+
+    let $table1 = $('.table');
+    var sum = 0;
+    $table1.find('tbody tr').each(function(){
+      $(this).find('th:last').each(function(){
+        if(!isNaN(Number($(this).text()))){
+          sum=sum+Number($(this).text());
+        }
+      });
+    });
+
+    $(document).find('#total_harga').val(sum);
+  }
+
+  save_cart() {
+    const headers = Array.from(
+      document.querySelectorAll('.table tr:first-child th'),
+      th => th.textContent.trim()
+    );
+    // Make an empty array for every item in headers:
+    const data = Array.from(headers, () => []);
+    for (const tr of document.querySelectorAll('.table tr:nth-child(n + 2)')) {
+      [...tr.children].forEach((th, i) => {
+        data[i].push(th.textContent.trim());
+      });
+    }
+
+    let id_pegawai      = $(document).find('#id_pegawai').val();
+    let jenis_transaksi = $(document).find('#jenis_transaksi').val();
+    
+    $.ajax({
+      type    : 'POST',
+      dataType: 'JSON',
+      url     : location.href,
+      data    : {
+        action      : 'save_cart',
+        jenis_transaksi : jenis_transaksi,
+        id_pegawai  : id_pegawai,
+        data        : {
+          'headers' : headers,
+          'value'   : data
+        }
+      },
+    })
+    .done(function(response) {
+
+      if ( response.success == false ) {
+
+        Swal.fire({
+          icon    : 'error',
+          title   : 'Oops...',
+          text    : response.message,
+        });
+          
+
+      } else {
+        Swal.fire({
+          icon: 'success',
+          title: response.message,
+          showConfirmButton: false,
+          timer: 3000
+        });
+        
+        setTimeout(() => {
+          document.location.reload();
+        }, 2000);
+      }
+      
+    });
+  }
+
+  changeTotal() {
+    let jumlah, harga;
+
+    let jenis_transaksi   = $(document).find('#jenis_transaksi').val();
+    let $container_total  = $(this).closest('tr').find('th:last');
+
+    jumlah  = $(this).closest('tr').find('#jumlah-cart').val();
+
+    if ( jenis_transaksi == 'pengambilan' ) {
+      harga   = $(this).closest('tr').find('#harga').html();
+    }
+
+    if ( jenis_transaksi === 'penambahan' ) {
+      harga   = $(this).closest('tr').find('#harga').find('#harga-barang').val();
+      console.log(harga);
+    }
+
+    $(this).closest('tr').find('.jumlah-hidden').html(jumlah);
+
+    $container_total.html(jumlah*harga);
+
+    let $table1 = $('.table');
+    var sum = 0;
+    $table1.find('tbody tr').each(function(){
+      $(this).find('th:last').each(function(){
+        if(!isNaN(Number($(this).text()))){
+          sum=sum+Number($(this).text());
+        }
+      });
+    });
+
+    $(document).find('#total_harga').val(sum);
+
+  }
+
+  addToCart() {
+    
+    let id, name, harga, jumlah, default_number, default_harga, total, removeItem, jenis_transaksi, default_stok;
+    let data = [];
+    
+    default_number  = 1;
+    default_harga   = $(this).closest('.list-item').data('harga-barang');
+    default_stok    = $(this).closest('.list-item').data('stok-barang');
+    
+    jenis_transaksi  = $(document).find('#jenis_transaksi').val();
+
+    id      = $(this).closest('.list-item').data('search-id');
+    name    = $(this).closest('.list-item').data('search-name');
+    jumlah  = '<input id="jumlah-cart" type="number" class="form-control" style="width: 115px;" id="quantity" name="quantity" min="1" max="'+default_stok+'" value="'+default_number+'"><p class="jumlah-hidden hidden">'+default_number+'</p>';
+    
+    if ( jenis_transaksi == 'pengambilan' ) {
+      harga   = default_harga;
+      total   = default_number*harga;
+    }
+
+    if ( jenis_transaksi == 'penambahan' ) {
+      harga   = '<input id="harga-barang" type="number" class="form-control" style="width: 115px;" id="price" name="price" min="1" value="'+default_harga+'"><p class="harga-hidden hidden">'+default_harga+'</p>';
+      total   = default_number*default_harga;
+    }
+    
+    
+    removeItem  = '<button type="button" class="close remove-current-item" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+
+    data  = [id, name, harga];
+
+    $('.table').append('<tr class="row-data"><th>'+removeItem+'</th>><th class="id-data">'+id+'</th><th>'+name+'</th><th class="count-data">'+jumlah+'</th><th><div id="harga">'+harga+'</div></th><th>'+total+'</th></tr>');
+
+    let $table1 = $('.table');
+    var sum = 0;
+    $table1.find('tbody tr').each(function(){
+      $(this).find('th:last').each(function(){
+        if(!isNaN(Number($(this).text()))){
+          sum=sum+Number($(this).text());
+        }
+      });
+    });
+
+    $(document).find('#total_harga').val(sum);
+    
+  }
+
+  searchBox() {
+    var input, filter, ul, li, a, i, txtValue;
+
+    if ( $(document).find('#search-box').is(":visible") ) {
+      input = document.getElementById("search-box");
+      filter = input.value.toUpperCase();
+      ul = document.getElementById("container-list-barang");
+      li = ul.getElementsByTagName("li");
+      for (i = 0; i < li.length; i++) {
+          a = li[i].getElementsByTagName("a")[0];
+          txtValue = a.textContent || a.innerText;
+          if (txtValue.toUpperCase().indexOf(filter) > -1) {
+              li[i].style.display = "";
+          } else {
+              li[i].style.display = "none";
+          }
+      }
+    }
+    
   }
 
   documentPrint() {
@@ -422,6 +772,8 @@ class ATK {
     if ( $header === true ) {
         $new_data = $data.slice(total_header);
     }
+
+    let $type                 = $(document).find('#typeSelect').val();
     
     if ($('.import-nilai').length > 0) {
         $semester             = $(document).find('.import-nilai').find('#semester_select').val();
@@ -439,6 +791,7 @@ class ATK {
       url     : location.href,
       data    : {
         action      : 'import',
+        type        : $type,
         disable_row : $row,
         data        : $new_data,
         semester    : $semester,
@@ -494,6 +847,19 @@ class ATK {
     });
 
     return result;
+  }
+
+  calculateTotal( sum ) {
+    let $table1 = $('.table');
+    // var sum = 0;
+    $table1.find('tbody tr').each(function(){
+      $(this).find('th:last').each(function(){
+        if(!isNaN(Number($(this).text()))){
+          sum=sum+Number($(this).text());
+        }
+      });
+    });
+    return sum;
   }
 }
 

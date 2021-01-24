@@ -59,3 +59,15 @@ function untrailingslashit( $string ) {
 function esc_attr( $value ) {
 	return $value;
 }
+
+function current_time( $type, $gmt = 0 ) {
+
+	if ( 'mysql' === $type ) {
+		$type = 'Y-m-d H:i:s';
+	}
+
+	$timezone = new DateTimeZone( 'UTC' );
+	$datetime = new DateTime( 'now', $timezone );
+
+	return $datetime->format( $type );
+}

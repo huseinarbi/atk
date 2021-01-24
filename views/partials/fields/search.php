@@ -46,10 +46,11 @@
         <?php else : ?>
           <input class="form-control" id="<?php echo $id; ?>" placeholder="<?php echo $label; ?>" value="<?php echo !empty($data) ? $data : ''; ?>" <?php echo ($required) ? 'required="required"' : ''; ?> <?php echo $editable === false ? 'readonly' : '' ?> style="border:none;background:white;">
         <?php endif; ?>
+
         <?php if (isset($data_search) && !empty($data_search)) : foreach ($data_search as $key => $value) : ?>
-        <ul class="<?php echo str_replace('_','',$id).'-list'; ?>" style="display:none;">
-            <li class="list" data-search-id="<?php echo $value['search_id']; ?>" data-search-name="<?php echo $value['search_name']; ?>"><?php echo $value[$id]; ?></li>
-        </ul>
+          <ul class="<?php echo str_replace('_','',$id).'-list'; ?>" style="display:none;">
+              <li class="list" data-search-id="<?php echo $value['search_id']; ?>" data-search-name="<?php echo $value['search_name']; ?>"><?php echo $value[$id]; ?></li>
+          </ul>
         <?php endforeach; endif; ?>
-    </div>
+  </div>
 </div>

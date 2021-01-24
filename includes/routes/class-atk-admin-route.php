@@ -16,217 +16,95 @@ class ATK_Admin_Route extends ATK_Route {
         
 	}
 	
-	public function handlePegawai( $page ) {
-
-		if (empty( $page ) ) {
-			$page = 1;
+	public function handleUser( $page ) {
+		if ( Flight::request()->method == 'GET' ) {
+			$this->setTitle( 'Daftar User' );
+			$this->users->view_data( $page );
 		}
-
-		$this->setTitle( 'Daftar Pegawai' );
-
-		$cols = array(
-			'id_pegawai'    => 'ID',
-			'nama_pegawai'	=> 'Nama Pegawai',
-			'bagian'	 	=> 'Bagian'
-		);
-
-        Flight::render('table', array(
-			'heading' 	=> 'Daftar Pegawai',
-			'base_url' 	=> get_url('pegawai'),
-			'add'  		=> 'Tambah Pegawai',
-			'btn_download'	=> array(
-				array(
-					'string'	=> 'Template pegawai',
-					'id'		=> 'download_pegawai',
-					'url'		=> 'uploads/Template_pegawai.xlsx'
-				)
-			),
-			'table' 	=> $this->db->getTableData(array(
-				'cols'  => $cols,
-				'page'  => $page,
-				'table' => 'pegawai',
-				'key'   => 'id_pegawai'
-			))
-		));
-
+		
+		if ( Flight::request()->method == 'POST' ) {
+			$this->setTitle( 'Import User' );
+			$this->users->import_user( $_REQUEST['data'] );
+		}
 	}
 
-    public function handleBarang($page) { 
+	public function handleEditUser( $action, $id_user ) {
+		$this->setTitle( 'Edit User' );
+		$this->users->edit_data( $action, $id_user );
+	}
 
-        if (empty($page)) {
-            $page = 1;
-        }
-        
-        $this->setTitle('Barang ATK');
-
-        $cols = array(
-			'id_barang'     => 'ID',
-			'nama_barang'	=> 'Nama Barang',
-			'jumlah_barang' => 'Jumlah',
-			'satuan' 	    => 'Satuan',
-			'harga' 	    => 'Harga'
-		);
-
-        Flight::render('table', array(
-			'heading' 	=> 'Data Barang',
-			'base_url' 	=> get_url('barang'),
-			'more_btn' 	=> array(
-				'button1' 	=> array(
-					'title' 	=> 'Detail',
-					'url' 		=> 'detail',
-					'action' 	=> 'view'
-				)
-			),
-			'add'  		=> 'Tambah Barang',
-			'btn_download'	=> array(
-				array(
-					'string'	=> 'Template Barang',
-					'id'		=> 'download_barang',
-					'url'		=> 'uploads/Template_Barang.xlsx'
-				)
-			),
-			'table' 	=> $this->db->getTableData(array(
-				'cols'  => $cols,
-				'page'  => $page,
-				'table' => 'barang',
-				'key'   => 'id_barang'
-			))
-		));
+    public function handleBarang( $page ) { 
+		if ( Flight::request()->method == 'GET' ) {
+			$this->setTitle( 'Barang ATK' );
+			$this->barang->view_data( $page );
+		}
+		
+		if ( Flight::request()->method == 'POST' ) {
+			$this->barang->import_barang( $_REQUEST['data'] );
+		}
     }
 
-    public function handleEditBarang( $id ) {
-        
-        $save_error_message = array();
-
-		if ('POST' === $this->_getMethod()) {
-
-			$save_error_message  	= $this->db->saveData(array(
-				'table' 	=> 'mapel',
-				'data'		=> $_POST,
-				'edit' 		=> !empty($id) ? array( //to /Edit
-					'key'		=> 'id_mapel',
-					'key_value'	=> $id
-				) : ''
-			));
-
-			if (!empty($save_error_message)) {
-
-                Flight::addMessage($save_error_message, 'error');
-                
-			} else {
-
-				Flight::addMessage('Data berhasil disimpan', 'success');
-				Flight::redirect('/mapel');
-                exit();
-                
-			}
-		}
-
-		if ($id) {
-			$data_mapel = $this->db->getTableData(array(
-				'cols'  => '',
-				'page'  => '1',
-				'table' => 'mapel',
-				'key'   => 'id_mapel',
-				'join'  => array(
-					'peminatan' => 'id_peminatan'
-				),
-				'where' => $id
-			));
-
-			foreach ($data_mapel['data'] as $key => $field) {
-				extract($field);
-			}
-		}
-
-		$sections = array(
-			array(
-				'title'		=> 'Options',
-				'fields' 	=> array(
-					array(
-						'name' 		=> 'nama_barang',
-						'label'		=> 'Nama Barang',
-						'type' 		=> 'text',
-						'data'		=> isset($tingkat) ? $tingkat : '',
-						'required'	=> true
-					)
-				)
-			)
-		);
-
-		Flight::render('form', array(
-			'heading' 	=> 'Add Barang',
-			'sections' 	=> $sections
-		));
+    public function handleEditBarang( $action, $id ) {
+        $this->setTitle( 'Edit Barang' );
+        $this->barang->edit_data( $action, $id );
 	}
 	
 	public function handlePengambilan() {
+		if ( Flight::request()->method == 'GET' ) {
+			$this->setTitle( 'Pengambilan Barang' );
+			$this->barang->cart( 'pengambilan' );
+		}
 
-		$sections = array(
-			array(
-				'title'		=> 'Keranjang',
-				'fields' 	=> array(
-					array(
-						'name' 		=> 'id',
-						'label'		=> 'Pegawai',
-						'type'		=> 'select',
-						'full'		=> false,
-						'value'		=> $this->db->getOptions('users', 'id', 'username'),
-						'data'		=> null,
-						'required'	=> true
-					),
-					array(
-						'name' 		=> 'id_barang',
-						'label'		=> 'ID Barang / Nama Barang',
-						'type'		=> 'text',
-						'full'		=> false,
-						'data'		=> null,
-						'required'	=> true
-					),
-					array(
-						'name' 		=> 'id_barang',
-						'label'		=> 'ID Barang / Nama Barang',
-						'type'		=> 'text',
-						'full'		=> false,
-						'data'		=> null,
-						'required'	=> true
-					),
-					array(
-						'type'		=> 'table',
-						'fields'	=> array('id_barang', 'nama_barang', 'jumlah', 'harga_satuan', 'total'),
-						'required'	=> true
-					),
-					
-					array(
-						'name' 		=> 'total_harga',
-						'label'		=> 'Total Harga',
-						'type'		=> 'label',
-						'full'		=> false,
-						'data'		=> null,
-						'required'	=> true
-					),
-				)
-			)
-		);
+		if ( Flight::request()->method == 'POST' ) {
+			$this->setTitle( 'Pengambilan Barang' );
+			$this->barang->save_cart( 'pengambilan' );
+		}
+		
+	}
 
-		Flight::render('form', array(
-			'heading' 		=> 'Pengambilan Barang',
-			'sections' 		=> $sections,
-			'custom_button'	=> array(
-				array(
-					'id' 	=> 'submit',
-					'type'	=> 'submit',
-					'class'	=> 'btn-success',
-					'label'	=> 'Simpan'
-				),
-				array(
-					'id' 	=> 'reset',
-					'type'	=> '',
-					'class'	=> 'btn-danger',
-					'label'	=> 'Hapus'
-				),
-			)
-		));
+	public function handlePenambahan() {
+		if ( Flight::request()->method == 'GET' ) {
+			$this->setTitle( 'Penambahan Barang' );
+			$this->barang->cart( 'penambahan' );
+		}
+
+		if ( Flight::request()->method == 'POST' ) {
+			$this->setTitle( 'Penambahan Barang' );
+			$this->barang->save_cart( 'penambahan' );
+		}
+	}
+
+	public function handlePrediksi( $page ) {
+		$this->setTitle( 'Prediksi Barang' );
+		$this->prediksi->view_data( $page );
+	}
+
+	public function handleDetailPrediksi( $id_barang ) {
+		$this->setTitle( 'Detail Prediksi Barang' );
+		$this->prediksi->view_detail( $id_barang );
+	}
+
+	public function handleLaporan( $section, $page ) {
+		$this->setTitle( 'Laporan' );
+		$this->laporan->view_data( $section, $page );
+	}
+
+	public function handleTutupBuku() {
+		if ( Flight::request()->method == 'GET' ) {
+			$this->setTitle( 'Tutup Buku' );
+			$this->laporan->tutup_buku();
+		}
+
+		if ( Flight::request()->method == 'POST' ) {
+			if ( $_POST['action'] == 'check_tutup_buku' ) {
+				$this->laporan->check_tutup_buku( $_POST['action'] );
+			}
+
+			if ( $_POST['action'] == 'save_tutup_buku' ) {
+				$this->setTitle( 'Tutup Buku' );
+				$this->laporan->save_tutup_buku( $_REQUEST['date'] );
+			}
+		}
 	}
     
     public function getRoutes() {
@@ -241,26 +119,33 @@ class ATK_Admin_Route extends ATK_Route {
 				)
 			),
 			array(
-				'route'    => '/pegawai(/page/@page:[0-9]+)',
-				'callback' => array( $this, 'handlePegawai' ),
+				'route'    => '/user(/page/@page:[0-9]+)',
+				'callback' => array( $this, 'handleUser' ),
 				'menu'     => array(
-					'url'		=> get_url( '/pegawai' ),
-					'text'  	=> 'Pegawai',
+					'url'		=> get_url( '/user' ),
+					'text'  	=> 'User',
 					'icon'  	=> 'ni ni-circle-08',
 				)
-            ),
+			),
+			array(
+				// 'route'    => '/penilaian/harian/(@add(/@idmapel))',
+				'route'    => '/user/(@edit(/@id_user))',
+				'callback' => array($this, 'handleEditUser'),
+				'menu'     => false
+			),
+			
 			array(
 				'route'    => '/barang(/page/@page:[0-9]+)',
 				'callback' => array( $this, 'handleBarang' ),
 				'menu'     => array(
 					'url'		=> get_url( '/barang' ),
 					'text'  	=> 'Barang',
-					'icon'  	=> 'ni ni-circle-08',
+					'icon'  	=> 'ni ni-books',
 					'br'		=> true
 				)
 			),
             array(
-				'route'    => '/barang/(add|edit(/@id_barang))',
+				'route'    => '/barang/(@edit(/@id_barang))',
 				'callback' => array($this, 'handleEditBarang'),
 				'menu'     => false
             ),
@@ -270,26 +155,51 @@ class ATK_Admin_Route extends ATK_Route {
 				'menu'     => array(
 					'url'		=> get_url( '/pengambilan' ),
 					'text'  	=> 'Pengambilan',
-					'icon'  	=> 'ni ni-circle-08'
+					'icon'  	=> 'ni ni-bold-up'
 				)
-			),
+			),	
 			array(
 				'route'    => '/penambahan',
 				'callback' => array($this, 'handlePenambahan'),
 				'menu'     => array(
 					'url'		=> get_url( '/penambahan' ),
 					'text'  	=> 'Penambahan',
-					'icon'  	=> 'ni ni-circle-08',
+					'icon'  	=> 'ni ni-bold-down',
 					'br'		=> true
 				)
 			),
 			array(
-				'route'    => '/laporan-stok',
-				'callback' => array($this, 'handleLaporanStok'),
+				'route'    => '/prediksi(/page/@page:[0-9]+)',
+				'callback' => array($this, 'handlePrediksi'),
 				'menu'     => array(
-					'url'		=> get_url( '/laporan-stok' ),
+					'url'		=> get_url( '/prediksi' ),
+					'text'  	=> 'Prediksi Barang',
+					'icon'  	=> 'ni ni-single-copy-04',
+					'br'		=> true
+				)
+			),
+			array(
+				'route'    => '/prediksi/(detail(/@id_barang))',
+				'callback' => array($this, 'handleDetailPrediksi'),
+				'menu'     => false
+			),
+			array(
+				'route'    => '/laporan/(@section)(/page/@page:[0-9]+)',
+				'callback' => array($this, 'handleLaporan'),
+				'menu'     => array(
+					'url'		=> get_url( '/laporan/bulanan' ),
 					'text'  	=> 'Laporan Stok',
-					'icon'  	=> 'ni ni-circle-08',
+					'icon'  	=> 'ni ni-single-copy-04',
+					// 'br'		=> true
+				)
+			),
+			array(
+				'route'    => '/tutup-buku',
+				'callback' => array($this, 'handleTutupBuku'),
+				'menu'     => array(
+					'url'		=> get_url( '/tutup-buku' ),
+					'text'  	=> 'Tutup Buku',
+					'icon'  	=> 'ni ni-single-copy-04',
 					'br'		=> true
 				)
 			)

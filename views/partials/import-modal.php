@@ -54,6 +54,15 @@
 						<!--   Tabs Sheet   -->
 						<div class="tab-pane fade <?php echo empty($import_mapel) ? 'show active' : ''; ?>" id="tabs-sheet" role="tabpanel" aria-labelledby="tabs-icons-text-sheet-tab">
 							<div style="padding: 10px;">
+								<label class="form-control-label" for="sheetSelect">Type</label>
+							</div>
+							<select class="form-control" id="typeSelect" name="typeSelect">
+								<option value="" hidden="hidden">Type Import</option> 
+								<option value="barang">Import Barang</option> 
+								<option value="pengambilan">Import Pengambilan</option> 
+								<option value="penambahan">Import Penambahan</option> 
+							</select>
+							<div style="padding: 10px;">
 								<label class="form-control-label" for="sheetSelect">Sheet</label>
 							</div>
 							<select class="form-control" id="sheetSelect" name="sheetSelect">
