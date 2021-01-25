@@ -30,7 +30,7 @@ class ATK_Users {
     public function view_data( $page = false ) {
 		global $pdodb;
 
-        if (empty( $page ) ) {
+        if ( empty( $page ) ) {
 			$page = 1;
 		}
 
@@ -40,10 +40,10 @@ class ATK_Users {
 			'bagian'	 	=> 'Bagian'
 		);
 
-        Flight::render('table', array(
-			'heading' 	=> 'Daftar User',
-			'base_url' 	=> get_url('user'),
-			'add'  		=> 'Tambah User',
+        Flight::render( 'table', array(
+			'heading' 		=> 'Daftar User',
+			'base_url' 		=> get_url('user'),
+			'add'  			=> 'Tambah User',
 			'btn_download'	=> array(
 				array(
 					'string'	=> 'Template User',
@@ -51,11 +51,11 @@ class ATK_Users {
 					'url'		=> 'uploads/Template_pegawai.xlsx'
 				)
 			),
-			'table' 	=> $pdodb->getTableData(array(
-				'cols'  => $cols,
-				'page'  => $page,
-				'table' => 'pegawai',
-				'key'   => 'id_pegawai'
+			'table' 		=> $pdodb->getTableData( array(
+				'cols'  		=> $cols,
+				'page'  		=> $page,
+				'table' 		=> 'pegawai',
+				'key'   		=> 'id_pegawai'
 			))
 		));
 	}
@@ -67,28 +67,26 @@ class ATK_Users {
 
 		if ( 'POST' === $this->_getMethod ) {
 
-			$save_error_message	= $pdodb->saveData(array(
+			$save_error_message	= $pdodb->saveData( array(
 				'table' 		=> 'pegawai',
 				'data'			=> $_POST,
-				'edit' 			=> !empty($id) && $action === 'edit' ? array( //to /Edit
+				'edit' 			=> ! empty( $id ) && $action === 'edit' ? array( //to /Edit
 					'key'		=> 'id_pegawai',
 					'key_value'	=> $id
 				) : ''
 			));
 
-			if (!empty($save_error_message['error'])) {
-
-				Flight::addMessage($save_error_message, 'error');
+			if ( ! empty( $save_error_message['error'] ) ) {
+				Flight::addMessage( $save_error_message, 'error' );
 			} else {
-
-				Flight::addMessage('Data berhasil disimpan', 'success');
-				Flight::redirect('/user');
+				Flight::addMessage( 'Data berhasil disimpan', 'success' );
+				Flight::redirect( '/user' );
 				exit();
 			}
 		}
 
 		if ($id) {
-			$data_users = $pdodb->getTableData(array(
+			$data_users = $pdodb->getTableData( array(
 				'cols'  => array( 
 					'id_pegawai' 	=> 'ID', 
 					'nama_pegawai' 	=> 'Nama Pegawai',
@@ -104,8 +102,8 @@ class ATK_Users {
 				'where' => $id
 			));
 
-			foreach ($data_users['data'] as $key => $field) {
-				extract($field);
+			foreach ( $data_users['data'] as $key => $field ) {
+				extract( $field );
 			}
 		}
 
@@ -117,21 +115,21 @@ class ATK_Users {
 						'name' 		=> 'nama_pegawai',
 						'label'		=> 'Nama Pegawai',
 						'type' 		=> 'text',
-						'data'		=> isset($nama_pegawai) ? $nama_pegawai : '',
+						'data'		=> isset( $nama_pegawai ) ? $nama_pegawai : '',
 						'required'	=> true
 					),
 					array(
 						'name' 		=> 'bagian',
 						'label'		=> 'Bagian',
 						'type' 		=> 'text',
-						'data'		=> isset($bagian) ? $bagian : '',
+						'data'		=> isset( $bagian ) ? $bagian : '',
 						'required'	=> true
 					)
 				)
 			)
 		);
 
-		Flight::render('form', array(
+		Flight::render( 'form', array(
 			'heading' 	=> 'Add Pegawai',
 			'sections' 	=> $sections
 		));
@@ -139,7 +137,7 @@ class ATK_Users {
 
 	public function import_user( $data ) {
 		echo '<pre>';
-		print_r($data);
+		print_r( $data );
 		exit();
 	}
 }
