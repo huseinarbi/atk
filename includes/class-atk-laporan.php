@@ -4,7 +4,7 @@
  *
  * @class       ATK_Laporan
  * @version		1.0
- * @author huseinarbi <huseinarbi66@gmail.com>
+ * @author      huseinarbi <huseinarbi66@gmail.com>
  */
 
 class ATK_Laporan {
@@ -30,7 +30,7 @@ class ATK_Laporan {
     public function view_data( $section, $page ) {
         global $pdodb;
 
-        $periode    = isset( $_REQUEST['periode'] ) ? $_REQUEST['periode'] : '2020-12';
+        $periode = isset( $_REQUEST['periode'] ) ? $_REQUEST['periode'] : '2020-12';
 
         if ( $periode ) {
             $periode = explode( '-', $periode );
@@ -46,12 +46,12 @@ class ATK_Laporan {
             $table  = 'laporan';
             $key    = 'id_laporan';
             $cols   = array(
-                'id_laporan'    => 'ID',
-                'nama_barang'   => 'Nama Barang',
-                'stok_awal'     => 'Awal Bulan',
-                'jumlah_pengambilan'   => 'Pengambilan',
-                'jumlah_penambahan'    => 'Penambahan',
-                'stok_akhir'    => 'Akhir Bulan',
+                'id_laporan'            => 'ID',
+                'nama_barang'           => 'Nama Barang',
+                'stok_awal'             => 'Awal Bulan',
+                'jumlah_pengambilan'    => 'Pengambilan',
+                'jumlah_penambahan'     => 'Penambahan',
+                'stok_akhir'            => 'Akhir Bulan',
                 'harga_barang'  => array(
                     'laporan'   => 'Harga'
                 ),
@@ -59,7 +59,7 @@ class ATK_Laporan {
             );
 
             $join   = array(
-                'barang'     => 'id_barang'
+                'barang'    => 'id_barang'
             );
 
             $where  = array(
@@ -72,7 +72,7 @@ class ATK_Laporan {
             $table  = 'transaksi';
             $key    = 'id_transaksi';
             
-            $cols_view   = array(
+            $cols_view = array(
                 'id_transaksi'          => 'ID',
                 'nama_pegawai'          => 'Nama Pegawai',
                 'nama_barang'           => 'Nama Barang',
@@ -82,7 +82,7 @@ class ATK_Laporan {
                 )
             );
 
-            $cols   = array(
+            $cols = array(
                 'id_transaksi'          => 'ID',
                 'nama_pegawai'          => 'Nama Pegawai',
                 'nama_barang'           => 'Nama Barang',
@@ -98,8 +98,8 @@ class ATK_Laporan {
             );
 
             $where  = array(
-                'transaksi.jenis'   => 'pengambilan',
-                'YEAR(date(transaksi.created_at))' => $periode[0],
+                'transaksi.jenis'                   => 'pengambilan',
+                'YEAR(date(transaksi.created_at))'  => $periode[0],
                 'MONTH(date(transaksi.created_at))' => $periode[1]
             );
 
@@ -205,18 +205,18 @@ class ATK_Laporan {
 			// 		'url'		=> 'uploads/Template_Barang.xlsx'
 			// 	)
             // ),
-            'sections'   => $sections,
-			'table' 	=> $pdodb->getTableData(array(
+            'sections'      => $sections,
+			'table' 	    => $pdodb->getTableData( array(
                 'cols'      => $cols,
                 'cols_view' => isset( $cols_view ) && $cols_view ? $cols_view : false,
-				'page'  => $page,
-				'table' => $table,
-                'key'   => $key,
-                'join'  => isset( $join ) && $join ? $join : false,
-                'where' => isset( $where ) && $where ? $where : false,
-                'group_by' => isset( $group_by ) && $group_by ? $group_by : false
+				'page'      => $page,
+				'table'     => $table,
+                'key'       => $key,
+                'join'      => isset( $join ) && $join ? $join : false,
+                'where'     => isset( $where ) && $where ? $where : false,
+                'group_by'  => isset( $group_by ) && $group_by ? $group_by : false
             )),
-            'base'  => get_url().'laporan/'.$section,
+            'base'              => get_url().'laporan/'.$section,
             'active_section'    => $section
 		));
     }
@@ -230,11 +230,11 @@ class ATK_Laporan {
             $table  = 'laporan';
             $key    = 'id_laporan';
             $cols   = array(
-                'id_laporan'    => 'ID',
+                'id_laporan'                    => 'ID',
                 'max(periode_bulan) as periode' => 'Periode'
             );
             
-            $laporan = $pdodb->getTableData(array(
+            $laporan = $pdodb->getTableData( array(
                 'cols'      => $cols,
 				'page'      => $page,
 				'table'     => $table,
@@ -244,7 +244,7 @@ class ATK_Laporan {
                 'group_by'  => isset( $group_by ) && $group_by ? $group_by : false
             ) );
 
-            $periode = current($laporan['data'])['periode'];
+            $periode = current( $laporan['data'] )['periode'];
             $periode = date( "Y-m", strtotime( $periode ) );
 
             $response = array(
@@ -259,7 +259,7 @@ class ATK_Laporan {
             );
         }
 
-        Flight::json($response);
+        Flight::json( $response );
     }
 
     public function tutup_buku() {
@@ -278,20 +278,20 @@ class ATK_Laporan {
         $table  = 'laporan';
         $key    = 'id_laporan';
         $cols   = array(
-            'id_laporan'    => 'ID',
-            'nama_barang'   => 'Nama Barang',
-            'stok_awal'     => 'Awal Bulan',
-            'jumlah_pengambilan'   => 'Pengambilan',
-            'jumlah_penambahan'    => 'Penambahan',
-            'stok_akhir'    => 'Akhir Bulan',
-            'harga_barang'  => array(
+            'id_laporan'            => 'ID',
+            'nama_barang'           => 'Nama Barang',
+            'stok_awal'             => 'Awal Bulan',
+            'jumlah_pengambilan'    => 'Pengambilan',
+            'jumlah_penambahan'     => 'Penambahan',
+            'stok_akhir'            => 'Akhir Bulan',
+            'harga_barang'          => array(
                 'laporan'   => 'Harga'
             ),
-            'periode_bulan' => 'Periode'
+            'periode_bulan'         => 'Periode'
         );
 
         $join   = array(
-            'barang'     => 'id_barang'
+            'barang'    => 'id_barang'
         );
 
         $where  = array(
@@ -319,11 +319,11 @@ class ATK_Laporan {
             ),
         );
 
-        Flight::render('laporan', array(
+        Flight::render( 'laporan', array(
 			'heading' 	=> 'Tutup Buku',
 			'base_url' 	=> get_url('tutup-buku'),
             'sections'  => $sections,
-			'table' 	=> $pdodb->getTableData(array(
+			'table' 	=> $pdodb->getTableData( array(
                 'cols'      => $cols,
                 'cols_view' => isset( $cols_view ) && $cols_view ? $cols_view : false,
 				'page'      => $page,
@@ -391,7 +391,7 @@ class ATK_Laporan {
 
                 // exit();
                 
-                $save_error_message	= $pdodb->updateData(array(
+                $save_error_message	= $pdodb->updateData( array(
                     'table' 		=> 'laporan',
                     'data'			=> $data,
                     'where' 		=> array(
@@ -426,7 +426,6 @@ class ATK_Laporan {
         echo '<pre>';
         print_r($response);
         exit();
-
         
 	}
 
