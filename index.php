@@ -117,5 +117,5 @@ switch ( current( $roles ) ) {
 		new ATK_Pegawai_Route();
 		break;
 }
-new ATK_Project();
+// new ATK_Project();
 Flight::start();
