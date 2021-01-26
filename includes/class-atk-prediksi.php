@@ -77,13 +77,23 @@ class ATK_Prediksi {
                 $kriteria   = isset( $last['kriteria'] ) ? $last['kriteria'] : '';
             }
 
+            $stok_barang        = $this->get_stok_barang( $id_barang );
+            $pengadaan          = $this->get_pengadaan( $pred, $stok_barang['stok'] );
+
             $to_table_final[ $id_barang ] = array(
                 'id_barang'     => $id_barang,
                 'nama_barang'   => $group[$id_barang][0]['nama_barang'],
                 'pengambilan'   => $pred,
+                'pengadaan'     => $pengadaan,
                 'akurasi'       => $akurasi,
                 'kriteria'      => $kriteria
             );
+
+            if ( isset( $_REQUEST['type'] ) && $_REQUEST['type'] == 'pengadaan' ) {
+                if ( $pengadaan <= 0 ) {
+                    unset( $to_table_final[$id_barang] );
+                }
+            }
         }
 
         if ( ! isset( $_REQUEST['periode'] ) ) {
@@ -101,10 +111,28 @@ class ATK_Prediksi {
 						'data'		=> null,
                         'required'	=> true,
                         'data'      => isset( $_REQUEST['periode'] ) ? $_REQUEST['periode'] : ''
+                    ),
+                    array(
+						'name' 		=> 'type-prediksi-option',
+						'label'		=> 'Type',
+						'type'		=> 'select-option',
+						'value'		=> array(
+							array(
+								'id'		=> 'all',
+								'values'	=> 'Semua'
+							),
+							array(
+								'id'		=> 'pengadaan',
+								'values'	=> 'Pengadaan'
+							)
+						),
+						'data'		=> isset( $_REQUEST['type'] ) ? $_REQUEST['type'] : '',
+						'required'	=> true
 					),
 					array(
-						'type'		=> 'table',
-						'fields'	=> array( 'id_barang', 'nama_barang', 'pengambilan', 'akurasi', 'kriteria' ),
+                        'type'		=> 'table-print',
+                        'table_id'  => 'table-prediksi',
+						'fields'	=> array( 'id_barang', 'nama_barang', 'pengambilan', 'pengadaan', 'akurasi', 'kriteria', '' ),
                         'required'	=> true,
                         'data'      => $to_table_final
 					),
@@ -116,18 +144,12 @@ class ATK_Prediksi {
 			'heading' 		=> 'Prediksi',
 			'sections' 		=> $sections,
 			'custom_button'	=> array(
-				array(
-					'id' 	=> 'sumbit-save-cart',
-					'type'	=> '',
-					'class'	=> 'btn-success',
-					'label'	=> 'Simpan'
-				),
-				array(
-					'id' 	=> 'reset',
-					'type'	=> '',
-					'class'	=> 'btn-danger',
-					'label'	=> 'Hapus'
-				),
+				// array(
+				// 	'id' 	=> 'sumbit-save-cart',
+				// 	'type'	=> '',
+				// 	'class'	=> 'btn-success',
+				// 	'label'	=> 'Print'
+				// )
 			)
 		));
     }
@@ -415,6 +437,40 @@ class ATK_Prediksi {
         } else {
             return 'Sangat Rendah';
         }
+    }
+
+    public function get_stok_barang( $id_barang ) {
+        global $pdodb;
+
+        $data_barang = $pdodb->getTableData( array(
+            'cols'      => array( 
+                'id_barang' 	=> 'ID',
+                'nama_barang'   => 'Nama Barang',
+                'harga_barang'  => 'Harga Barang',
+                'stok'          => 'Stok'
+            ),
+            'page'      => '1',
+            'table'     => 'barang',
+            'key'       => 'id_barang',
+            'where'     => array(
+                'id_barang'   => $id_barang
+            )
+        ));
+
+        $data = current( $data_barang['data'] );
+
+        return $data;
+    }
+
+    public function get_pengadaan( $pred, $stok_barang ) {
+
+        $pengadaan = $pred - $stok_barang;
+
+        if ( $pengadaan < 0 ) {
+            return 0;
+        }
+
+       return $pengadaan;
     }
 
 }

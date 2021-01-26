@@ -168,7 +168,10 @@ class ATK_Db {
 
 				if ( empty( $this->db->getLastError()[2] ) ) {
 					if ( ! empty( $login ) ) {
-						$this->setUserLogin( $login['email'], $login['username'], $login['password'], $login['role'] );
+						$id_user_roles = $this->setUserLogin( $login['email'], $login['username'], $login['password'], $login['role'] );
+
+						$this->db->where( 'id_pegawai', $id );
+						$this->db->update( $table, array( 'id' => $id_user_roles ) );
 					}
 					$this->db->delete('users_throttling');	
 				}
@@ -240,7 +243,7 @@ class ATK_Db {
 			$delete 		= $args['delete'];
 			$delete_login 	= !empty($args['login']) ? $args['login'] : '' ;
 
-			if( !empty( $args['login'] ) ) {
+			if( ! empty( $args['login'] ) ) {
 				$this->deleteUserLogin( $delete_login['key'] );
 			}
 
@@ -248,7 +251,9 @@ class ATK_Db {
 				$this->db->where($delete_value['key'], $delete_value['key_value']);
 			}
 
-			if($this->db->delete($table)) {
+			$delete_result = $this->db->delete($table);
+
+			if( $delete_result ) {
 				throw new Exception('Data Gagal Dihapus');
 			}
 
@@ -276,6 +281,7 @@ class ATK_Db {
 			$userId = $this->auth->register($email, $password, $username);
 			$this->auth->admin()->addRoleForUserById($userId, $roles[$role]);
 
+			return $userId;
 		} catch (\Exception $e) {
 			throw( $e );
 		}

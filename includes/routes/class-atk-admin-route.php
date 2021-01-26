@@ -29,8 +29,13 @@ class ATK_Admin_Route extends ATK_Route {
 	}
 
 	public function handleEditUser( $action, $id_user ) {
-		$this->setTitle( 'Edit User' );
-		$this->users->edit_data( $action, $id_user );
+		if ( $action == 'delete' ) {
+			$this->setTitle( 'Delete user' );
+			$this->users->delete_data( $action, $id_user );
+		} else {
+			$this->setTitle( 'Edit User' );
+			$this->users->edit_data( $action, $id_user );
+		}
 	}
 
     public function handleBarang( $page ) { 
