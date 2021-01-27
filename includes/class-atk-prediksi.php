@@ -100,6 +100,12 @@ class ATK_Prediksi {
             $to_table_final = [];
         }
 
+        foreach ( $group as $key_group => $barang ) {
+            if ( $periode_bulan < reset( $barang )['date'] ) {
+                $to_table_final = [];
+            }
+        }
+
 		$sections = array(
 			array(
 				'title'		=> 'Prediksi',
@@ -307,6 +313,10 @@ class ATK_Prediksi {
         foreach ( $group as $key_group => $barang ) {
             $period         = [];
             $pengambilan    = [];
+
+            if ( $periode_bulan < reset( $barang )['date'] ) {
+                $periode_bulan = '2020-01';
+            }
             
             $period = new DatePeriod(
                 new DateTime( reset( $barang )['date'] ),
