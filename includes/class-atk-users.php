@@ -55,13 +55,14 @@ class ATK_Users {
 			'heading' 		=> 'Daftar User',
 			'base_url' 		=> get_url('user'),
 			'add'  			=> 'Tambah User',
-			'btn_download'	=> array(
-				array(
-					'string'	=> 'Template User',
-					'id'		=> 'download_user',
-					'url'		=> 'uploads/Template_pegawai.xlsx'
-				)
-			),
+			'disable_import'=> true,
+			// 'btn_download'	=> array(
+			// 	array(
+			// 		'string'	=> 'Template User',
+			// 		'id'		=> 'download_user',
+			// 		'url'		=> 'uploads/Template_pegawai.xlsx'
+			// 	)
+			// ),
 			'table' 		=> $data
 		));
 	}

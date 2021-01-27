@@ -1,3 +1,10 @@
+<?php
+
+if ( isset( $_REQUEST ) && ! empty( $_REQUEST ) ) {
+	$query_string = '?'.http_build_query($_REQUEST,'','&');
+}
+
+?>
 <div id="<?php echo isset($id) ? $id : 'form-table-part' ?>" class="col-lg-12">
     <div class="form-group">
         <table id="<?php echo $table_id; ?>"" class="table align-items-center table-flush responsive" style="width:100%; padding-top:15px">
@@ -19,7 +26,7 @@
                             <?php echo '<td>'.$value.'</td>'; ?>
                         <?php endforeach; ?>
                         <td>
-                        <a href="<?php echo  '/'. 'prediksi/'. 'detail/'. $values['id_barang']; ?>" class="btn btn-primary"><?php echo 'detail'; ?></a>
+                        <a href="<?php echo  '/'. 'prediksi/'. 'detail/'. $values['id_barang'].$query_string; ?>" class="btn btn-primary"><?php echo 'detail'; ?></a>
                         </td>
                         </tr>
                 <?php endforeach; ?>

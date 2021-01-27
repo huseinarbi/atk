@@ -102,7 +102,7 @@ class ATK_Prediksi {
 
 		$sections = array(
 			array(
-				'title'		=> 'Keranjang',
+				'title'		=> 'Prediksi',
 				'fields' 	=> array(
 					array(
 						'name' 		=> 'date-periode-prediksi',
@@ -157,8 +157,9 @@ class ATK_Prediksi {
     public function view_detail( $id_barang ) {
         global $pdodb;
 
-        $group          = [];
-        $periode_bulan  = date( "Y-m", strtotime( current_time( 'mysql' ) ) );
+        $group                      = [];
+        $periode_bulan              = date( "Y-m", strtotime( current_time( 'mysql' ) ) );
+        $periode_bulan_pengambilan  = '2019-09';
 
         if ( isset( $_REQUEST['periode'] ) ) {
             $periode_bulan = $_REQUEST['periode'];
@@ -198,6 +199,7 @@ class ATK_Prediksi {
         foreach ( $final_ as $id_barang => $value ) {
 
             foreach ( $value as $key => $detail ) {
+
                 if ( isset( $detail['a'] ) && isset( $detail['b'] ) ) {
                     $a          = $detail['a'];
                     $b          = $detail['b'];
@@ -206,7 +208,9 @@ class ATK_Prediksi {
                     $kriteria   = isset( $detail['kriteria'] ) ? $detail['kriteria'] : '';
                 }
                 
-                $pred[] = $detail['pengambilan'];
+                $pred[$periode_bulan_pengambilan]   = $detail['pengambilan'];
+                $periode_bulan_pengambilan          = date( "Y-m", strtotime( "+1 month", strtotime( $periode_bulan_pengambilan ) ) );
+
             }
 
             $to_table_final = array(

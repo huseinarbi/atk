@@ -105,7 +105,7 @@
 							<tbody>
 								<?php if (!empty($table['data'])) : foreach ($table['data'] as $data) : ?>
 										<tr>
-											<?php foreach ($table['cols'] as $col_key => $col_name) : ?>
+											<?php foreach (!empty( $table['cols_view'] ) ? $table['cols_view'] : $table['cols'] as $col_key => $col_name) : ?>
 
 												<?php if (is_array($col_name)) : ?>
 													<?php foreach ($col_name as $key => $value) : ?>

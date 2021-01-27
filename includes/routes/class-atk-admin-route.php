@@ -174,7 +174,7 @@ class ATK_Admin_Route extends ATK_Route {
 				)
 			),
 			array(
-				'route'    => '/prediksi(/page/@page:[0-9]+)',
+				'route'    => '/prediksi(/page/@page:[0-9]+)/',
 				'callback' => array($this, 'handlePrediksi'),
 				'menu'     => array(
 					'url'		=> get_url( '/prediksi' ),
