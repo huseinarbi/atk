@@ -4,9 +4,10 @@
                 <?php foreach ($data as $field => $value) : ?>
                     
                         <?php if ( is_array( $value ) ) : ?>
-                            
-                            <?php foreach( $value as $periode => $val ) : ?>
-                                <tr><td><?php echo 'periode-'.abs($periode+1); ?></td><td><?php echo $val; ?></td></tr>
+                            <?php $xx = 1; ?>
+                            <?php foreach( $value as $periode => $val ) : ?>   
+                                <tr><td><?php echo 'periode-'.($xx.' ('.$periode.')'); ?></td><td><?php echo $val; ?></td></tr>
+                                <?php $xx++; ?>
                             <?php endforeach; ?>
                         <?php else : ?>
                             <thead>

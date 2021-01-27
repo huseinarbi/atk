@@ -26,16 +26,16 @@ class ATK_Db {
 		$per_page = defined( 'DATA_PER_PAGE' ) ? DATA_PER_PAGE : 10; // perpage
 		$page     = intval( $args['page'] );
 		$offset   = ( $page - 1 ) * $per_page;
-		$join     = isset( $args['join'] ) && !empty( $args['join'] ) ? $args['join'] : false;
+		$join     = isset( $args['join'] ) && ! empty( $args['join'] ) ? $args['join'] : false;
 
-		if ( isset($args['join']) && is_array( $args['join'] ) ) {
-			foreach ($join as $j_table => $j_field) {
+		if ( isset( $args['join'] ) && is_array( $args['join'] ) ) {
+			foreach ( $join as $j_table => $j_field ) {
 				if ( is_array( $j_field ) ) { //if table join with other table join
-					foreach ($j_field as $j_table2 => $j_field2) {
-						$this->db->join($j_table, sprintf( '%s.%s=%s.%s', $j_table, $j_field2, $j_table2, $j_field2 ), 'LEFT');
+					foreach ( $j_field as $j_table2 => $j_field2 ) {
+						$this->db->join($j_table, sprintf( '%s.%s=%s.%s', $j_table, $j_field2, $j_table2, $j_field2 ), 'LEFT' );
 					}
 				} else {
-					$this->db->join($j_table, sprintf( '%s.%s=%s.%s', $j_table, $j_field, $args['table'], $j_field ), 'LEFT');
+					$this->db->join( $j_table, sprintf( '%s.%s=%s.%s', $j_table, $j_field, $args['table'], $j_field ), 'LEFT' );
 				}
 
 			}
@@ -44,18 +44,18 @@ class ATK_Db {
 		if ( isset( $args['where'] ) && $args['where'] ) {
 			if ( is_array($args['where']) ) { //if where not primary key
 				$where = $args['where'];
-				foreach ($where as $where_key => $where_field) {
-					$this->db->where($where_key, $where_field);
+				foreach ( $where as $where_key => $where_field ) {
+					$this->db->where( $where_key, $where_field );
 				}
 			} else {
-				$this->db->where($args['key'], $args['where']);
+				$this->db->where( $args['key'], $args['where'] );
 			}
 		}
 
 		if( isset( $args['cols'] ) ) {
-			foreach ($args['cols'] as $column_key => $column) {
-				if ( is_array($column) ) {
-					foreach ($column as $key => $value) {
+			foreach ( $args['cols'] as $column_key => $column ) {
+				if ( is_array( $column ) ) {
+					foreach ( $column as $key => $value ) {
 						$cols[$key.'.'.$column_key] = $value;
 					}
 				} else {
@@ -65,21 +65,21 @@ class ATK_Db {
 		}
 
 		try {
-			if ( isset($args['group_by']) && ! empty( $args['group_by'] ) ) {
-				$this->db->groupBy($args['group_by']);
+			if ( isset( $args['group_by'] ) && ! empty( $args['group_by'] ) ) {
+				$this->db->groupBy( $args['group_by'] );
 			}
 
-			if ( isset($args['order_by']) ) {
-				foreach ($args['order_by'] as $key => $value) {
-					$this->db->orderBy($key,$value);
+			if ( isset( $args['order_by'] ) ) {
+				foreach ( $args['order_by'] as $key => $value ) {
+					$this->db->orderBy( $key,$value );
 				}
 			}
 
-            $data	= $this->db->withTotalCount()->get( $args['table'], array($offset, $per_page), !empty($cols) ? array_keys( $cols ) : '' );
+            $data	= $this->db->withTotalCount()->get( $args['table'], array( $offset, $per_page ), ! empty( $cols ) ? array_keys( $cols ) : '' );
 			$error	= $this->db->getLastError();
 
-			if ( !empty($error[2]) ) {
-				throw new Exception($error[2]);
+			if ( ! empty( $error[2] ) ) {
+				throw new Exception( $error[2] );
 			}
 
 		} catch (\Exception $e) {
@@ -89,7 +89,7 @@ class ATK_Db {
 		$total_page = ceil( $this->db->totalCount / $per_page );
 		$table_data = array(
 			'cols' 			=> $args['cols'],
-			'cols_view' 	=> !empty($args['cols_view']) ? $args['cols_view'] : '',
+			'cols_view' 	=> ! empty( $args['cols_view'] ) ? $args['cols_view'] : '',
 			'key'  			=> $args['key'],
 			'data' 			=> $data,
 			'pagination' 	=> array(
@@ -97,12 +97,12 @@ class ATK_Db {
 				'total' 	=> $total_page
 			),
 			'last_query'	=> $this->db->getLastQuery(),
-			'error_catch' => isset($error_catch) ? $error_catch : ''
+			'error_catch' 	=> isset( $error_catch ) ? $error_catch : ''
 		);
 
 		if( isset( $_REQUEST['debug'] ) ) {
 			echo '<pre>';
-			print_r($table_data);
+			print_r( $table_data );
 			exit();
 		}
 
@@ -113,10 +113,10 @@ class ATK_Db {
 		$data		= $this->db->get( $table );
 		$options 	= array();
 
-		foreach ($data as $key => $value) {
+		foreach ( $data as $key => $value ) {
 			$options[$key] = array(
-				'id' => $value[ $field_id ],
-				'values' => $value[ $field_label ]
+				'id' 		=> $value[ $field_id ],
+				'values' 	=> $value[ $field_label ]
 			);
 		}
 
@@ -139,22 +139,22 @@ class ATK_Db {
 
 			$data 	        = $args['data'];
 			$table 	        = $args['table'];
-			$login	        = isset($args['login']) ? $args['login'] : '';
-			$current_role   = isset($login['current_role']) ? $login['current_role'] : '';
+			$login	        = isset( $args['login'] ) ? $args['login'] : '';
+			$current_role   = isset( $login['current_role'] ) ? $login['current_role'] : '';
 
 			if ( is_array( $args['data'] ) ) {
-				foreach ($args['data'] as $field => $value) {
+				foreach ( $args['data'] as $field => $value ) {
 					$data[$field] = !empty($value) || $value == '0' ? $value : NULL;
 				}
 			}
 
-			if ( isset( $args['edit'] ) && ! empty( $args['edit'] )) {
+			if ( isset( $args['edit'] ) && ! empty( $args['edit'] ) ) {
 				$edit = $args['edit'];
 
-				$this->db->where($edit['key'],$edit['key_value']);
+				$this->db->where( $edit['key'],$edit['key_value'] );
 
-				if ($this->db->update($table, $data)) {
-					if ( !empty( $login ) && !empty($current_role) ){
+				if ( $this->db->update( $table, $data ) ) {
+					if ( ! empty( $login ) && ! empty( $current_role ) ){
 						$this->editUserLogin( $login['email'], $login['username'], $login['password'], $login['role'], $current_role );
 					}
 					
@@ -164,11 +164,14 @@ class ATK_Db {
                 
 			} else {
 
-				$id = $this->db->insert($table, $data);
+				$id = $this->db->insert( $table, $data );
 
-				if ( empty($this->db->getLastError()[2]) ) {
-					if ( !empty( $login ) ) {
-						$this->setUserLogin( $login['email'], $login['username'], $login['password'], $login['role'] );
+				if ( empty( $this->db->getLastError()[2] ) ) {
+					if ( ! empty( $login ) ) {
+						$id_user_roles = $this->setUserLogin( $login['email'], $login['username'], $login['password'], $login['role'] );
+
+						$this->db->where( 'id_pegawai', $id );
+						$this->db->update( $table, array( 'id' => $id_user_roles ) );
 					}
 					$this->db->delete('users_throttling');	
 				}
@@ -176,8 +179,8 @@ class ATK_Db {
 				$error['id'] = $id;
 			}
 
-			if ( !empty($this->db->getLastError()[2]) ) {
-				throw new Exception($this->db->getLastError()[2]);
+			if ( !empty( $this->db->getLastError()[2] ) ) {
+				throw new Exception( $this->db->getLastError()[2] );
 			}
 
 		}  catch (\Delight\Auth\InvalidEmailException $e) {
@@ -205,7 +208,6 @@ class ATK_Db {
 		$page     	= intval( 1 );
 		$offset   	= ( $page - 1 ) * $per_page;
 
-		echo '<pre>';
 		try {
 			$data 	        = $args['data'];
 			$table 	        = $args['table'];
@@ -241,7 +243,7 @@ class ATK_Db {
 			$delete 		= $args['delete'];
 			$delete_login 	= !empty($args['login']) ? $args['login'] : '' ;
 
-			if( !empty( $args['login'] ) ) {
+			if( ! empty( $args['login'] ) ) {
 				$this->deleteUserLogin( $delete_login['key'] );
 			}
 
@@ -249,7 +251,9 @@ class ATK_Db {
 				$this->db->where($delete_value['key'], $delete_value['key_value']);
 			}
 
-			if($this->db->delete($table)) {
+			$delete_result = $this->db->delete($table);
+
+			if( $delete_result ) {
 				throw new Exception('Data Gagal Dihapus');
 			}
 
@@ -277,6 +281,7 @@ class ATK_Db {
 			$userId = $this->auth->register($email, $password, $username);
 			$this->auth->admin()->addRoleForUserById($userId, $roles[$role]);
 
+			return $userId;
 		} catch (\Exception $e) {
 			throw( $e );
 		}

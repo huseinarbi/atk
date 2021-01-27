@@ -47,7 +47,7 @@ class ATK_Prediksi {
                 'nama_barang'   => array(
                     'barang'    => 'Nama Barang'
                 ),
-                'DATE( transaksi.created_at ) as date'      => 'Periode',
+                'DATE( transaksi.created_at ) as date'                                                              => 'Periode',
                 'case when SUM( transaksi.jumlah ) is null then 0 else SUM( transaksi.jumlah ) end as pengambilan' 	=> 'Pengambilan'
             ),
             'page'  => '1',
@@ -77,13 +77,23 @@ class ATK_Prediksi {
                 $kriteria   = isset( $last['kriteria'] ) ? $last['kriteria'] : '';
             }
 
+            $stok_barang        = $this->get_stok_barang( $id_barang );
+            $pengadaan          = $this->get_pengadaan( $pred, $stok_barang['stok'] );
+
             $to_table_final[ $id_barang ] = array(
                 'id_barang'     => $id_barang,
                 'nama_barang'   => $group[$id_barang][0]['nama_barang'],
                 'pengambilan'   => $pred,
+                'pengadaan'     => $pengadaan,
                 'akurasi'       => $akurasi,
                 'kriteria'      => $kriteria
             );
+
+            if ( isset( $_REQUEST['type'] ) && $_REQUEST['type'] == 'pengadaan' ) {
+                if ( $pengadaan <= 0 ) {
+                    unset( $to_table_final[$id_barang] );
+                }
+            }
         }
 
         if ( ! isset( $_REQUEST['periode'] ) ) {
@@ -92,7 +102,7 @@ class ATK_Prediksi {
 
 		$sections = array(
 			array(
-				'title'		=> 'Keranjang',
+				'title'		=> 'Prediksi',
 				'fields' 	=> array(
 					array(
 						'name' 		=> 'date-periode-prediksi',
@@ -101,10 +111,28 @@ class ATK_Prediksi {
 						'data'		=> null,
                         'required'	=> true,
                         'data'      => isset( $_REQUEST['periode'] ) ? $_REQUEST['periode'] : ''
+                    ),
+                    array(
+						'name' 		=> 'type-prediksi-option',
+						'label'		=> 'Type',
+						'type'		=> 'select-option',
+						'value'		=> array(
+							array(
+								'id'		=> 'all',
+								'values'	=> 'Semua'
+							),
+							array(
+								'id'		=> 'pengadaan',
+								'values'	=> 'Pengadaan'
+							)
+						),
+						'data'		=> isset( $_REQUEST['type'] ) ? $_REQUEST['type'] : '',
+						'required'	=> true
 					),
 					array(
-						'type'		=> 'table',
-						'fields'	=> array( 'id_barang', 'nama_barang', 'pengambilan', 'akurasi', 'kriteria' ),
+                        'type'		=> 'table-print',
+                        'table_id'  => 'table-prediksi',
+						'fields'	=> array( 'id_barang', 'nama_barang', 'pengambilan', 'pengadaan', 'akurasi', 'kriteria', '' ),
                         'required'	=> true,
                         'data'      => $to_table_final
 					),
@@ -116,18 +144,12 @@ class ATK_Prediksi {
 			'heading' 		=> 'Prediksi',
 			'sections' 		=> $sections,
 			'custom_button'	=> array(
-				array(
-					'id' 	=> 'sumbit-save-cart',
-					'type'	=> '',
-					'class'	=> 'btn-success',
-					'label'	=> 'Simpan'
-				),
-				array(
-					'id' 	=> 'reset',
-					'type'	=> '',
-					'class'	=> 'btn-danger',
-					'label'	=> 'Hapus'
-				),
+				// array(
+				// 	'id' 	=> 'sumbit-save-cart',
+				// 	'type'	=> '',
+				// 	'class'	=> 'btn-success',
+				// 	'label'	=> 'Print'
+				// )
 			)
 		));
     }
@@ -135,15 +157,16 @@ class ATK_Prediksi {
     public function view_detail( $id_barang ) {
         global $pdodb;
 
-        $group          = [];
-        $periode_bulan  = date("Y-m", strtotime( current_time( 'mysql' ) ) );
+        $group                      = [];
+        $periode_bulan              = date( "Y-m", strtotime( current_time( 'mysql' ) ) );
+        $periode_bulan_pengambilan  = '2019-09';
 
         if ( isset( $_REQUEST['periode'] ) ) {
             $periode_bulan = $_REQUEST['periode'];
         }
 
-        $data_pengambilan = $pdodb->getTableData(array(
-            'cols'  => array( 
+        $data_pengambilan = $pdodb->getTableData( array(
+            'cols'      => array( 
                 'id_barang' 	=> array(
                     'transaksi' => 'ID Barang'
                 ), 
@@ -153,13 +176,13 @@ class ATK_Prediksi {
                 'DATE( transaksi.created_at ) as date'      => 'Periode',
                 'SUM( transaksi.jumlah ) as pengambilan' 	=> 'Pengambilan'
             ),
-            'page'  => '1',
-            'table' => 'transaksi',
-            'key'   => 'id_transaksi',
-            'join'  => array(
-                'barang' => 'id_barang'
+            'page'      => '1',
+            'table'     => 'transaksi',
+            'key'       => 'id_transaksi',
+            'join'      => array(
+                'barang'    => 'id_barang'
             ),
-            'where' => array(
+            'where'     => array(
                 'jenis'                 => 'pengambilan',
                 'transaksi.id_barang'   => $id_barang
             ),
@@ -173,13 +196,10 @@ class ATK_Prediksi {
         $final_ = $this->get_pengambilan_data_view( $group, $periode_bulan );
         $final_ = $this->get_prediction( $final_ );
 
-        // echo '<pre>';
-        // print_r($final_);
-        // exit();
-
         foreach ( $final_ as $id_barang => $value ) {
 
             foreach ( $value as $key => $detail ) {
+
                 if ( isset( $detail['a'] ) && isset( $detail['b'] ) ) {
                     $a          = $detail['a'];
                     $b          = $detail['b'];
@@ -188,7 +208,9 @@ class ATK_Prediksi {
                     $kriteria   = isset( $detail['kriteria'] ) ? $detail['kriteria'] : '';
                 }
                 
-                $pred[] = $detail['pengambilan'];
+                $pred[$periode_bulan_pengambilan]   = $detail['pengambilan'];
+                $periode_bulan_pengambilan          = date( "Y-m", strtotime( "+1 month", strtotime( $periode_bulan_pengambilan ) ) );
+
             }
 
             $to_table_final = array(
@@ -207,10 +229,6 @@ class ATK_Prediksi {
 
         $value_to_chart = implode( ';', $to_table_final['periode'] );
 
-        // echo '<pre>';
-        // print_r(end($to_table_final['periode']));
-        // exit();
-
 		$sections = array(
 			array(
 				'title'		=> 'Detail',
@@ -226,65 +244,55 @@ class ATK_Prediksi {
                         'prediksi'      => end($to_table_final['periode'])
                     ),
                     array(
-                        'name' 		=> 'konstanta',
-						'label'		=> 'Konstanta (a)',
-						'type' 		=> 'label',
-						'data'		=> $detail_prediction['a'],
-						'editable'	=> true,
-                        'required'	=> true,
+                        'name' 		    => 'konstanta',
+						'label'		    => 'Konstanta (a)',
+						'type' 		    => 'label',
+						'data'		    => $detail_prediction['a'],
+						'editable'	    => true,
+                        'required'	    => true,
                         // 'disable'   => true,
-                        'style'     => ''
+                        'style'         => ''
                     ),
                     array(
-                        'name' 		=> 'koefisien',
-						'label'		=> 'Koefisien (b)',
-						'type' 		=> 'label',
-						'data'		=> $detail_prediction['b'],
-						'editable'	=> true,
-                        'required'	=> true,
+                        'name' 		    => 'koefisien',
+						'label'		    => 'Koefisien (b)',
+						'type' 		    => 'label',
+						'data'		    => $detail_prediction['b'],
+						'editable'	    => true,
+                        'required'	    => true,
                         // 'disable'   => true,
-                        'style'     => ''
+                        'style'         => ''
                     ),
                     array(
-                        'name' 		=> 'r',
-						'label'		=> 'Korelasi R',
-						'type' 		=> 'label',
-						'data'		=> $akurasi,
-						'editable'	=> true,
-                        'required'	=> true,
+                        'name' 		    => 'r',
+						'label'		    => 'Korelasi R',
+						'type' 		    => 'label',
+						'data'		    => $akurasi,
+						'editable'	    => true,
+                        'required'	    => true,
                         // 'disable'   => true,
-                        'style'     => ''
+                        'style'         => ''
                     ),
                     array(
-                        'name' 		=> 'kriteria',
-						'label'		=> 'Kriteria',
-						'type' 		=> 'label',
-						'data'		=> $kriteria,
-						'editable'	=> true,
-                        'required'	=> true,
+                        'name' 		    => 'kriteria',
+						'label'		    => 'Kriteria',
+						'type' 		    => 'label',
+						'data'		    => $kriteria,
+						'editable'	    => true,
+                        'required'	    => true,
                         // 'disable'   => true,
-                        'style'     => ''
+                        'style'         => ''
                     ),
-                    // array(
-                    //     'name' 		=> 'data-chart',
-					// 	'label'		=> 'Chart',
-					// 	'type' 		=> 'label',
-					// 	'data'		=> $kriteria,
-					// 	'editable'	=> true,
-                    //     'required'	=> true,
-                    //     // 'disable'   => true,
-                    //     'style'     => ''
-                    // ),
 					array(
-						'type'		=> 'table-detail',
-                        'required'	=> true,
-                        'data'      => $to_table_final
-					),
+						'type'		    => 'table-detail',
+                        'required'	    => true,
+                        'data'          => $to_table_final
+					)
 				)
 			)
 		);
 
-		Flight::render('cart', array(
+		Flight::render( 'cart', array(
 			'heading' 		=> 'Prediksi',
 			'sections' 		=> $sections,
 			'custom_button'	=> ''
@@ -320,10 +328,10 @@ class ATK_Prediksi {
 
                 $final_[$key_group][$key] = array(
                     'date'              => $date_period,
-                    'id_barang'         => current($barang)['id_barang'],
-                    'nama_barang'       => current($barang)['nama_barang'],
+                    'id_barang'         => current( $barang )['id_barang'],
+                    'nama_barang'       => current( $barang )['nama_barang'],
                     'periode'           => $x = $key+1,
-                    'pengambilan'       => $y = isset($pengambilan[$key]) ? $pengambilan[$key] : 0,
+                    'pengambilan'       => $y = isset( $pengambilan[$key] ) ? $pengambilan[$key] : 0,
                     'x_kuadrat'         => $x*$x,
                     'y_kuadrat'         => $y*$y,
                     'xy'                => $x*$y
@@ -331,171 +339,6 @@ class ATK_Prediksi {
             }
 
         }
-
-        // echo '<pre>';
-        // print_r($final_);
-        // exit();
-
-        return $final_;
-    }
-
-    public function get_pengambilan_data_view_back( $group, $periode_bulan ) {
-        /**
-         * create array periodik
-         */
-
-        foreach ( $group as $key_group => $barang ) {
-            $period         = [];
-            $pengambilan    = [];
-            
-            $period = new DatePeriod(
-                new DateTime( reset( $barang )['date'] ),
-                new DateInterval( 'P1M' ),
-                new DateTime( $periode_bulan )
-            );
-
-            foreach ( $barang as $keys => $values ) {
-                echo '<pre>';
-                print_r($barang);
-                
-                // exit();
-                $date[$keys]                = date( "Y-m", strtotime( $values['date'] ) );
-                $id_barang[$keys]           = $values['id_barang'];
-                $nama_barang[$keys]         = $values['nama_barang'];
-                $pengambilan[$keys]         = $values['pengambilan'];
-                // echo '<pre>';
-                // print_r($date);
-                $periodes           = 0;
-                foreach ( $period as $key => $value ) {
-
-                    // echo $key;
-
-                    $x                  = 0;
-                    $y                  = 0;
-                    
-
-                    // echo $periodes;
-                    
-    
-                   
-                    $date_period[$key]  = $value->format('Y-m');
-    
-                    // echo '<pre>';
-                    // echo $date[$keys] == $date_period[$key] ? $values['pengambilan'] : 0;
-                    // print_r($date[$keys]);
-                    // print_r($date_period[$key]);
-                    // exit();
-                    // echo '<pre>';
-                    print_r($id_barang);
-                    // echo !empty($barang[$periodes]['date']) ? $barang[$periodes]['date'] : '';
-
-                    if ($date[$keys] == $date_period[$key]) {
-                        $peng[$keys] = $pengambilan;
-                    } else {
-                        $peng[$keys] = 0;
-                    }
-
-                    $final_[$key_group][$periodes] = array(
-                        'date'          => !empty($barang[$periodes]['date']) ? $barang[$periodes]['date'] : '',
-                        'id_barang'     => $id_barang[0],
-                        'nama_barang'   => $nama_barang[0],
-                        'periode'       => $x = $key+1,
-                        'pengambilan'   => $peng[$keys],
-                        // 'x_kuadrat'     => $x*$x,
-                        // 'y_kuadrat'     => $pengambilan*$pengambilan,
-                        'xy'            => $x*$y
-                    );
-
-                    $periodes++;
-                    
-                    // if ( $date[$keys] == $date_period[$key] ) {
-                    //     // echo '<pre>';
-                    //     // var_dump($date[$keys]);
-                    //     // var_dump($date_period[$key]);
-                    //     // var_dump($pengambilan[$keys]);
-                    //     // exit();
-                    //     // echo '<pre>';
-                    //     // print_r($date_period[$key]);
-                    //     // print_r($pengambilan);
-                    //     // exit();
-    
-                        
-
-                    //     // print_r($final_[$key_group][$key]);
-                    //     // exit();
-                        
-                    // } else {
-                        
-                    //     $final_[$key_group][$key] = array(
-                    //         'date'          => $date_period[$key],
-                    //         'id_barang'     => $id_barang[0],
-                    //         'nama_barang'   => $nama_barang[0],
-                    //         'periode'       => $x = $key+1,
-                    //         'pengambilan'   => $y = 0,
-                    //         'x_kuadrat'     => $x*$x,
-                    //         'y_kuadrat'     => $y*$y,
-                    //         'xy'            => $x*$y
-                    //     );
-    
-                    // }
-
-                }
-            }
-
-            // echo '<pre>';
-            // count($barang);
-            // print_r($period);
-
-            // exit();
-            
-
-            // foreach ( $period as $key => $value ) {
-
-            //     $x                  = 0;
-            //     $y                  = 0;
-
-               
-            //     $date_period[$key]  = $value->format('Y-m');
-
-            //     // echo '<pre>';
-            //     // print_r($id_barang);
-                
-            //     if ( ! empty($date[$key]) && $date[$key] == $date_period[$key] ) {
-
-            //         $final_[$key_group][$key] = array(
-            //             'date'          => $date_period[$key],
-            //             'id_barang'     => $id_barang[0],
-            //             'nama_barang'   => $nama_barang[0],
-            //             'periode'       => $x = $key+1,
-            //             'pengambilan'   => $y = $pengambilan[$key],
-            //             'x_kuadrat'     => $x*$x,
-            //             'y_kuadrat'     => $y*$y,
-            //             'xy'            => $x*$y
-            //         );
-                    
-            //     } else {
-                    
-            //         $final_[$key_group][$key] = array(
-            //             'date'          => $date_period[$key],
-            //             'id_barang'     => $id_barang[0],
-            //             'nama_barang'   => $nama_barang[0],
-            //             'periode'       => $x = $key+1,
-            //             'pengambilan'   => $y = 0,
-            //             'x_kuadrat'     => $x*$x,
-            //             'y_kuadrat'     => $y*$y,
-            //             'xy'            => $x*$y
-            //         );
-
-            //     }
-                
-            // }
-
-            // exit();
-        }
-
-        echo '<pre>';
-        print_r($final_);
-        exit();
 
         return $final_;
     }
@@ -582,7 +425,7 @@ class ATK_Prediksi {
             return 0;
         }
 
-        return round ($R = $a / $b, 2);
+        return round ( $R = $a / $b, 2 );
     }
 
     public function get_kriteria( $R ) {
@@ -598,6 +441,40 @@ class ATK_Prediksi {
         } else {
             return 'Sangat Rendah';
         }
+    }
+
+    public function get_stok_barang( $id_barang ) {
+        global $pdodb;
+
+        $data_barang = $pdodb->getTableData( array(
+            'cols'      => array( 
+                'id_barang' 	=> 'ID',
+                'nama_barang'   => 'Nama Barang',
+                'harga_barang'  => 'Harga Barang',
+                'stok'          => 'Stok'
+            ),
+            'page'      => '1',
+            'table'     => 'barang',
+            'key'       => 'id_barang',
+            'where'     => array(
+                'id_barang'   => $id_barang
+            )
+        ));
+
+        $data = current( $data_barang['data'] );
+
+        return $data;
+    }
+
+    public function get_pengadaan( $pred, $stok_barang ) {
+
+        $pengadaan = $pred - $stok_barang;
+
+        if ( $pengadaan < 0 ) {
+            return 0;
+        }
+
+       return $pengadaan;
     }
 
 }

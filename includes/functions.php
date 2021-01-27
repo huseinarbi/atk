@@ -66,7 +66,7 @@ function current_time( $type, $gmt = 0 ) {
 		$type = 'Y-m-d H:i:s';
 	}
 
-	$timezone = new DateTimeZone( 'UTC' );
+	$timezone = new DateTimeZone( 'Asia/Jakarta' );
 	$datetime = new DateTime( 'now', $timezone );
 
 	return $datetime->format( $type );

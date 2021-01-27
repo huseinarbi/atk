@@ -75,6 +75,7 @@ class ATK {
     $(document).on( 'click', '#save-tutup-buku', this.save_tutup_buku );
 
     $(document).on( 'change', '#date-periode-prediksi', this.changePeriode );
+    $(document).on( 'change', '#type-prediksi-option', this.changeTypePeriode );
 
     this.load_chart();
     this.check_data_tutup_buku();
@@ -141,6 +142,13 @@ class ATK {
     if (!results) return null;
     if (!results[2]) return '';
     return decodeURIComponent(results[2].replace(/\+/g, ' '));
+  }
+
+  changeTypePeriode() {
+    var queryParams = new URLSearchParams(window.location.search);
+    queryParams.set("type", $(this).val());
+    history.replaceState(null, null, "?"+queryParams.toString());
+    document.location.reload();
   }
 
   changePeriode() {
@@ -391,8 +399,8 @@ class ATK {
 
   documentPrint() {
     const d         = new Printd();
-    let bundle_css  = $(document).find('#tableRapor').data('bundle-css');
-    let main_css    = $(document).find('#tableRapor').data('main-css');
+    let bundle_css  = $(document).find('#table-prediksi').data('bundle-css');
+    let main_css    = $(document).find('#table-prediksi').data('main-css');
     
     const styles  = [
       bundle_css,
@@ -401,7 +409,7 @@ class ATK {
       '.section-title {backgroud:black}'
     ]
 
-    const el = document.getElementById('tableRapor')
+    const el = document.getElementById('table-prediksi')
     const printCallback = ({ launchPrint }) => launchPrint()
 
     d.print(el, styles, printCallback)
@@ -415,13 +423,13 @@ class ATK {
       return;
     }
       if( $.fn.DataTable ){
-        var rapor_title = $('#tableRapor').attr('data-title');
-        $('#tableRapor').DataTable({ 
+        var rapor_title = $('#table-prediksi').attr('data-title');
+        $('#table-prediksi').DataTable({ 
           fnDrawCallback: function( settings ){
             if( this.api().page.info().pages === 1 ){
-              $('#tableRapor_paginate').hide();
+              $('#table-prediksi_paginate').hide();
             } else {
-              $('#tableRapor_paginate').show();
+              $('#table-prediksi_paginate').show();
             }
           },
          

@@ -4,7 +4,7 @@
  *
  * @class       ATK_Barang
  * @version		1.0
- * @author huseinarbi <huseinarbi66@gmail.com>
+ * @author 		huseinarbi <huseinarbi66@gmail.com>
  */
 
 class ATK_Barang {
@@ -56,13 +56,13 @@ class ATK_Barang {
 				)
 			),
 			'add'  		=> 'Tambah Barang',
-			'btn_download'	=> array(
-				array(
-					'string'	=> 'Template Barang',
-					'id'		=> 'download_barang',
-					'url'		=> 'uploads/Template_Barang.xlsx'
-				)
-			),
+			// 'btn_download'	=> array(
+			// 	array(
+			// 		'string'	=> 'Template Barang',
+			// 		'id'		=> 'download_barang',
+			// 		'url'		=> 'uploads/Template_Barang.xlsx'
+			// 	)
+			// ),
 			'table' 	=> $pdodb->getTableData(array(
 				'cols'  => $cols,
 				'page'  => $page,
@@ -79,12 +79,12 @@ class ATK_Barang {
 
 		if ( 'POST' === $this->_getMethod ) {
 
-			$current_data 		= $_POST;
+			$current_data = $_POST;
 
 			if ( $action == 'edit' ) {
 				
 				$more_data	= array( 
-					'modified_at' => current_time( 'mysql' ) 
+					'modified_at' 	=> current_time( 'mysql' ) 
 				);
 				
 			} else {
@@ -96,12 +96,12 @@ class ATK_Barang {
 
 			}
 
-			$data_to_save 	= array_merge( $current_data, $more_data );
+			$data_to_save = array_merge( $current_data, $more_data );
 
-			$save_error_message	= $pdodb->saveData(array(
+			$save_error_message	= $pdodb->saveData( array(
 				'table' 		=> 'barang',
 				'data'			=> $data_to_save,
-				'edit' 			=> !empty($id) && $action === 'edit' ? array( //to /Edit
+				'edit' 			=> !empty( $id ) && $action === 'edit' ? array(
 					'key'		=> 'id_barang',
 					'key_value'	=> $id
 				) : ''
@@ -119,26 +119,26 @@ class ATK_Barang {
 				'modified_at' 			=> current_time( 'mysql' )
 			);
 
-			$save_error_message	= $pdodb->saveData(array(
+			$save_error_message	= $pdodb->saveData( array(
 				'table' 		=> 'laporan',
 				'data'			=> $data_to_save_laporan
 			));
 
-			if (!empty($save_error_message['error'])) {
+			if ( !empty( $save_error_message['error'] ) ) {
 
-                Flight::addMessage($save_error_message, 'error');
+                Flight::addMessage( $save_error_message, 'error' );
                 
 			} else {
 
-				Flight::addMessage('Data berhasil disimpan', 'success');
-				Flight::redirect('/barang');
+				Flight::addMessage( 'Data berhasil disimpan', 'success' );
+				Flight::redirect( '/barang' );
                 exit();
                 
 			}
 		}
 
-		if ($id) {
-			$data_barang = $pdodb->getTableData(array(
+		if ( $id ) {
+			$data_barang = $pdodb->getTableData( array(
 				'cols'  => array(
 					'id_barang' 	=> 'ID',
 					'nama_barang'	=> 'Nama Barang',
@@ -152,8 +152,8 @@ class ATK_Barang {
 				'where' => $id
 			));
 
-			foreach ($data_barang['data'] as $key => $field) {
-				extract($field);
+			foreach ( $data_barang['data'] as $key => $field ) {
+				extract( $field );
 			}
 		}
 
@@ -165,28 +165,28 @@ class ATK_Barang {
 						'name' 		=> 'nama_barang',
 						'label'		=> 'Nama Barang',
 						'type' 		=> 'text',
-						'data'		=> isset($nama_barang) ? $nama_barang : '',
+						'data'		=> isset( $nama_barang ) ? $nama_barang : '',
 						'required'	=> true
 					),
 					array(
 						'name' 		=> 'satuan',
 						'label'		=> 'Satuan',
 						'type' 		=> 'text',
-						'data'		=> isset($satuan) ? $satuan : '',
+						'data'		=> isset( $satuan ) ? $satuan : '',
 						'required'	=> true
 					),
 					array(
 						'name' 		=> 'harga_barang',
 						'label'		=> 'Harga Barang',
 						'type' 		=> 'text',
-						'data'		=> isset($harga_barang) ? $harga_barang : '',
+						'data'		=> isset( $harga_barang ) ? $harga_barang : '',
 						'required'	=> true
 					),
 					array(
 						'name' 		=> 'stok',
 						'label'		=> 'Stok Barang',
 						'type' 		=> 'text',
-						'data'		=> isset($stok) ? $stok : '',
+						'data'		=> isset( $stok ) ? $stok : '',
 						'required'	=> true
 					)
 				)
@@ -212,9 +212,9 @@ class ATK_Barang {
 
 			if ( $type_import == 'barang' ) {
 				// to import barang
-				foreach ($data as $key => $item) {
+				foreach ( $data as $key => $item ) {
 					$final_data_to_save[] = array(
-						'id_barang'	=> $item[0],
+						'id_barang'		=> $item[0],
 						'nama_barang'	=> $item[1],
 						'satuan'		=> $item[2],
 						'harga_barang'	=> $item[3],
@@ -227,7 +227,7 @@ class ATK_Barang {
 			
 			if ( $type_import == 'pengambilan' || $type_import == 'penambahan' ) {
 				//to import pengambilan // penambahan
-				foreach ($data as $key => $item) {
+				foreach ( $data as $key => $item ) {
 					$final_data_to_save[] = array(
 						'id_transaksi'	=> $item[0],
 						'id_pegawai'	=> $item[1],
@@ -239,7 +239,7 @@ class ATK_Barang {
 				}
 			}
 			
-			foreach ($final_data_to_save as $key => $value) {
+			foreach ( $final_data_to_save as $key => $value ) {
 
 				if ( $type_import == 'barang' ) {
 					$save_error_message = $this->import_barang_debug( $value );
@@ -249,24 +249,24 @@ class ATK_Barang {
 					$save_error_message = $this->import_pengambilan_penambahan( $value );
 				}
 				
-				if (!empty($save_error_message['error'])) {
+				if ( !empty( $save_error_message['error'] ) ) {
 
 					$response = array(
 						'success'	=> false,
-						'message'	=> $count_success . ' Data dari ' . count($data) . ' Berhasil di Import'
+						'message'	=> $count_success . ' Data dari ' . count( $data ) . ' Berhasil di Import'
 					);
 
-					Flight::addMessage($response['message']);
+					Flight::addMessage( $response['message'] );
 
 				} else {
 
 					$count_success++;
 					$response = array(
 						'success'	=> true,
-						'message'	=> $count_success . ' Data dari ' . count($data) . ' Berhasil di Import'
+						'message'	=> $count_success . ' Data dari ' . count( $data ) . ' Berhasil di Import'
 					);
 
-					Flight::addMessage($response['message'], 'success');
+					Flight::addMessage( $response['message'], 'success' );
 				}
 			}
 		} catch ( Exception $e ) {
@@ -276,13 +276,13 @@ class ATK_Barang {
 			);
 		}
 
-		Flight::json($response);
+		Flight::json( $response );
 	}
 
 	public function import_barang_debug( $value ) {
 		global $pdodb;
 
-		$save_error_message = $pdodb->saveData(array(
+		$save_error_message = $pdodb->saveData( array(
 			'table' 		=> 'barang',
 			'data'			=> $value
 		));
@@ -299,7 +299,7 @@ class ATK_Barang {
 			'modified_at'			=> $value['modified_at']
 		);
 
-		$save_error_message	= $pdodb->saveData(array(
+		$save_error_message	= $pdodb->saveData( array(
 			'table' 		=> 'laporan',
 			'data'			=> $data_to_save_laporan
 		));
@@ -315,7 +315,7 @@ class ATK_Barang {
 		unset($value['id_transaksi']);
 
 		// insert table transaksi
-		$save_error_message = $pdodb->saveData(array(
+		$save_error_message = $pdodb->saveData( array(
 			'table' 		=> 'transaksi',
 			'data'			=> $value
 		));
@@ -336,11 +336,11 @@ class ATK_Barang {
 		$jumlah_			= $value['jumlah'];
 
 		if ( $value['jenis'] == 'pengambilan' ) {
-			$modified_at = array();
-			$new_stok	= $stok - $jumlah_;
+			$modified_at 	= array();
+			$new_stok		= $stok - $jumlah_;
 
 			$update_data = array(
-				'stok'			=> $new_stok
+				'stok'		=> $new_stok
 			);
 		}
 
@@ -356,10 +356,10 @@ class ATK_Barang {
 			);
 		}
 	
-		$save_error_message	= $pdodb->saveData(array(
+		$save_error_message	= $pdodb->saveData( array(
 			'table' 		=> 'barang',
 			'data'			=> array_merge( $update_data, $modified_at ),
-			'edit' 			=> !empty($value['id_barang']) ? array( //to /Edit
+			'edit' 			=> !empty( $value['id_barang'] ) ? array( //to /Edit
 				'key'		=> 'id_barang',
 				'key_value'	=> $value['id_barang']
 			) : ''
@@ -386,14 +386,14 @@ class ATK_Barang {
 			'table' => 'laporan',
 			'key'   => 'id_laporan',
 			'where' => array(
-				'id_barang'	=> $value['id_barang'],
+				'id_barang'		=> $value['id_barang'],
 				'periode_bulan'	=> date( "Y-m", strtotime( $value['created_at'] ) ).'-1'
 			)
 		) );
 
 		$select_from_laporan = current( $select_from_laporan['data'] );
 
-		if ( empty($select_from_laporan) ) {
+		if ( empty( $select_from_laporan ) ) {
 		
 			$stok_akhir = $pdodb->getTableData( array(
 				'cols'  => array(
@@ -405,8 +405,8 @@ class ATK_Barang {
 				'table' => 'laporan',
 				'key'   => 'id_laporan',
 				'where' => array(
-					'id_barang'	=> $value['id_barang'],
-					'periode_bulan'	=> date( "Y-m", strtotime( "-1 month", strtotime($value['created_at']) ) ).'-1',
+					'id_barang'		=> $value['id_barang'],
+					'periode_bulan'	=> date( "Y-m", strtotime( "-1 month", strtotime( $value['created_at'] ) ) ).'-1',
 				)
 			) );
 
@@ -421,7 +421,7 @@ class ATK_Barang {
 				'modified_at'	=> date( "Y-m", strtotime( $value['created_at'] ) ).'-1 12:12:12',
 			);
 			
-			$save_error_message = $pdodb->saveData(array(
+			$save_error_message = $pdodb->saveData( array(
 				'table' 		=> 'laporan',
 				'data'			=> $data_to_save
 			));
@@ -445,11 +445,10 @@ class ATK_Barang {
 			)
 		) );
 
-		$data_pengambilan_to_laporan = current($data_pengambilan_to_laporan['data']);
-
-		$data_penambahan_to_laporan = $pdodb->getTableData( array(
+		$data_pengambilan_to_laporan	= current( $data_pengambilan_to_laporan['data'] );
+		$data_penambahan_to_laporan 	= $pdodb->getTableData( array(
 			'cols'  => array(
-				'SUM(jumlah) as jumlah'	=> 'ID',
+				'SUM(jumlah) as jumlah'	=> 'ID'
 			),
 			'page'  => 1,
 			'table' => 'transaksi',
@@ -461,28 +460,28 @@ class ATK_Barang {
 			)
 		) );
 
-		$data_penambahan_to_laporan = current($data_penambahan_to_laporan['data']);
+		$data_penambahan_to_laporan 	= current( $data_penambahan_to_laporan['data'] );
 
 
 		$select_from_laporan1 = $pdodb->getTableData( array(
 			'cols'  => array(
-				'id_laporan'	=> 'ID',
-				'stok_awal'		=> 'Stok Awal',
+				'id_laporan'			=> 'ID',
+				'stok_awal'				=> 'Stok Awal',
 				'jumlah_pengambilan'	=> 'Pengambilan',
-				'jumlah_penambahan'		=> 'Penambahan',
+				'jumlah_penambahan'		=> 'Penambahan'
 			),
 			'page'  => 1,
 			'table' => 'laporan',
 			'key'   => 'id_laporan',
 			'where' => array(
-				'id_barang'	=> $value['id_barang'],
+				'id_barang'		=> $value['id_barang'],
 				'periode_bulan'	=> date( "Y-m", strtotime( $value['created_at'] ) ).'-1'
 			)
 		) );
 
-		$select_from_laporan1 = current($select_from_laporan1['data']);
+		$select_from_laporan1 = current( $select_from_laporan1['data'] );
 
-		$save_error_message	= $pdodb->saveData(array(
+		$save_error_message	= $pdodb->saveData( array(
 			'table' 		=> 'laporan',
 			'data'			=> array(
 				'jumlah_pengambilan'	=> !empty ( $data_pengambilan_to_laporan['jumlah'] ) ? $data_pengambilan_to_laporan['jumlah'] : '0',
@@ -496,46 +495,33 @@ class ATK_Barang {
 
 		$select_from_laporan2 = $pdodb->getTableData( array(
 			'cols'  => array(
-				'id_laporan'	=> 'ID',
-				'stok_awal'		=> 'Stok Awal',
+				'id_laporan'			=> 'ID',
+				'stok_awal'				=> 'Stok Awal',
 				'jumlah_pengambilan'	=> 'Pengambilan',
-				'jumlah_penambahan'		=> 'Penambahan',
+				'jumlah_penambahan'		=> 'Penambahan'
 			),
 			'page'  => 1,
 			'table' => 'laporan',
 			'key'   => 'id_laporan',
 			'where' => array(
-				'id_barang'	=> $value['id_barang'],
+				'id_barang'		=> $value['id_barang'],
 				'periode_bulan'	=> date( "Y-m", strtotime( $value['created_at'] ) ).'-1'
 			)
 		) );
 
-		$select_from_laporan2 	= current($select_from_laporan2['data']);
+		$select_from_laporan2 	= current( $select_from_laporan2['data'] );
 		$stok_akhir 			= $select_from_laporan2['stok_awal'] - $select_from_laporan2['jumlah_pengambilan'] + $select_from_laporan2['jumlah_penambahan'];
 
-		$save_error_message	= $pdodb->saveData(array(
+		$save_error_message	= $pdodb->saveData( array(
 			'table' 		=> 'laporan',
 			'data'			=> array(
-				'stok_akhir'			=> $stok_akhir
+				'stok_akhir'	=> $stok_akhir
 			),
 			'edit' 			=> array(
 				'key'		=> 'id_laporan',
 				'key_value'	=> $select_from_laporan2['id_laporan']
 			)
 		));
-	}
-
-	public function tutup_buku( $date ) {
-		$date = isset( $_POST['date'] ) ? $ $_POST['date'] : false;
-
-		if ( ! $date ) {
-			echo 'select date';
-			exit();
-		}
-
-		/**
-		 * @todo
-		 */
 	}
 
 	public function cart( $jenis_transaksi ) {
@@ -553,7 +539,7 @@ class ATK_Barang {
 			'key'   => 'id_barang'
 		));
 
-		foreach ($barang['data'] as $key => $value) {
+		foreach ( $barang['data'] as $key => $value ) {
 			$barang_search[$key] = array(
 				'search_name'	=> $value['nama_barang'],
 				'search_id'		=> $value['id_barang'],
@@ -584,19 +570,19 @@ class ATK_Barang {
 						'required'	=> true
 					),
 					array(
-						'name' 		=> 'barang',
-						'id'		=> 'search_id',
-						'label'		=> 'Barang',
-						'type' 		=> 'search-box',
-						'data_list'	=> isset($barang_search) ? $barang_search : '',
-						'data_search'	=> isset($barang_search) ? $barang_search : '',
-						'data'		=> isset($id_barang) ? $id_barang : '',
-						'editable'	=> isset($id_barang) ? false : true,
-						'required'	=> true
+						'name' 			=> 'barang',
+						'id'			=> 'search_id',
+						'label'			=> 'Barang',
+						'type' 			=> 'search-box',
+						'data_list'		=> isset( $barang_search ) ? $barang_search : '',
+						'data_search'	=> isset( $barang_search ) ? $barang_search : '',
+						'data'			=> isset( $id_barang ) ? $id_barang : '',
+						'editable'		=> isset( $id_barang ) ? false : true,
+						'required'		=> true
 					),
 					array(
 						'type'		=> 'table',
-						'fields'	=> array('','id_barang', 'nama_barang', 'jumlah', 'harga_satuan', 'total'),
+						'fields'	=> array( '', 'id_barang', 'nama_barang', 'jumlah', 'harga_satuan', 'total' ),
 						'required'	=> true
 					),
 					
@@ -613,7 +599,7 @@ class ATK_Barang {
 			)
 		);
 
-		Flight::render('cart', array(
+		Flight::render( 'cart', array(
 			'heading' 		=> ucwords( $jenis_transaksi. ' Barang' ),
 			'sections' 		=> $sections,
 			'custom_button'	=> array(
@@ -637,9 +623,7 @@ class ATK_Barang {
 		global $pdodb;
 
 		if ( isset( $_REQUEST['action'] ) && $_REQUEST['action'] == 'save_cart' ) {
-			// echo '<pre>';
-			// print_r( $this->check_laporan( 'pengambilan', '1', '2020-12' ) );
-			// exit();
+			
 			try {
 			
 				$id_pegawai			= isset( $_REQUEST['id_pegawai'] ) && ! empty( $_REQUEST['id_pegawai'] ) ? $_REQUEST['id_pegawai'] : false;
@@ -654,7 +638,7 @@ class ATK_Barang {
 				}
 
 				foreach ( $data['headers'] as $key => $value ) {
-					$value = strtolower( str_replace(' ','_', $value) );
+					$value = strtolower( str_replace( ' ','_', $value) );
 
 					if ( strstr( $value, 'id_barang' ) == $value ) {
 						$id_barang_key = $key;
@@ -691,7 +675,7 @@ class ATK_Barang {
 					}
 				}
 
-				foreach ($id_barang as $key => $value) {
+				foreach ( $id_barang as $key => $value ) {
 					$new_data = array(
 						'id_pegawai'	=> $id_pegawai,
 						'id_barang' 	=> $id_barang[$key],
@@ -700,7 +684,7 @@ class ATK_Barang {
 						'created_at'	=> current_time( 'mysql' )
 					);
 
-					$barang = $pdodb->getTableData(array(
+					$barang = $pdodb->getTableData( array(
 						'cols'  => array(
 							'id_barang'		=> 'ID',
 							'stok'			=> 'Stok Barang'
@@ -711,7 +695,7 @@ class ATK_Barang {
 						'where' => $new_data['id_barang']
 					));
 
-					$stok				= current($barang['data'])['stok'];
+					$stok				= current( $barang['data'] )['stok'];
 					$$jenis_transaksi	= $new_data['jumlah'];
 
 					if ( $jenis_transaksi == 'pengambilan' ) {
@@ -740,22 +724,22 @@ class ATK_Barang {
 					// print_r(array_merge( $update_data, $modified_at ));
 					// exit();
 
-					// $save_error_message	= $pdodb->saveData(array(
-					// 	'table' 		=> 'barang',
-					// 	'data'			=> array_merge( $update_data, $modified_at ),
-					// 	'edit' 			=> !empty($new_data['id_barang']) ? array( //to /Edit
-					// 		'key'		=> 'id_barang',
-					// 		'key_value'	=> $new_data['id_barang']
-					// 	) : ''
-					// ));
+					$save_error_message	= $pdodb->saveData( array(
+						'table' 		=> 'barang',
+						'data'			=> array_merge( $update_data, $modified_at ),
+						'edit' 			=> ! empty( $new_data['id_barang'] ) ? array( //to /Edit
+							'key'		=> 'id_barang',
+							'key_value'	=> $new_data['id_barang']
+						) : ''
+					));
 
-					// $save_error_message	= $pdodb->saveData(array(
-					// 	'table' 		=> 'transaksi',
-					// 	'data'			=> $new_data
-					// ));
+					$save_error_message	= $pdodb->saveData( array(
+						'table' 		=> 'transaksi',
+						'data'			=> $new_data
+					));
 				}
 	
-				if (!empty($save_error_message)) {
+				if ( ! empty( $save_error_message ) ) {
 	
 					throw new Exception( $save_error_message );
 					
@@ -766,7 +750,7 @@ class ATK_Barang {
 						'message'	=> 'Transaksi Berhasil Disimpan'
 					);
 
-					Flight::addMessage('Transaksi Berhasil Disimpan', 'success');
+					Flight::addMessage( 'Transaksi Berhasil Disimpan', 'success' );
 
 				}
 
@@ -777,7 +761,7 @@ class ATK_Barang {
 				);
 			}
 	
-			Flight::json($response);
+			Flight::json( $response );
 			
 		}
 	}
@@ -804,14 +788,14 @@ class ATK_Barang {
             'MONTH(date(laporan.periode_bulan))' 	=> $periode[1]
 		);
 
-		$laporan = $pdodb->getTableData(array(
-			'cols'  => $cols,
-			'page'  => 1,
-			'table' => 'laporan',
-			'key'   => 'id_laporan',
-			'join'  => isset( $join ) && $join ? $join : false,
-			'where' => isset( $where ) && $where ? $where : false,
-			'group_by' => isset( $group_by ) && $group_by ? $group_by : false
+		$laporan = $pdodb->getTableData( array(
+			'cols'  	=> $cols,
+			'page'  	=> 1,
+			'table' 	=> 'laporan',
+			'key'   	=> 'id_laporan',
+			'join'  	=> isset( $join ) && $join ? $join : false,
+			'where' 	=> isset( $where ) && $where ? $where : false,
+			'group_by' 	=> isset( $group_by ) && $group_by ? $group_by : false
 		));
 
 		if ( empty( $laporan['data'] ) ) {
