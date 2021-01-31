@@ -77,71 +77,75 @@
 					</div>
 				</div>
 
-				<div class="table-responsive">
-					<?php if (!empty($table)) : ?>
-						<table class="table align-items-center table-flush responsive">
-							<thead class="thead-light">
-								<tr>
-									<?php foreach ( !empty( $table['cols_view'] ) ? $table['cols_view'] : $table['cols'] as $col) : ?>
-										<?php if (is_array($col)) : ?>
-											<?php foreach ($col as $sub_col) : ?>
-												<?php if ($sub_col == 'ID') : ?>
-													<th scope="col" style="display:none;"><?php echo $sub_col; ?></th>
-												<?php else : ?>
-													<th scope="col"><?php echo $sub_col; ?></th>
-												<?php endif; ?>
-											<?php endforeach; ?>
-										<?php else : ?>
-											<?php if ($col == 'ID') : ?>
-												<th scope="col" style="display:none;"><?php echo $col; ?></th>
+				<div class="card shadow">
+					<div class="card-body">
+					<div class="table-responsive">
+						<?php if (!empty($table)) : ?>
+							<table id="table-print" class="table align-items-center table-flush responsive table-data-table" style="width:100%; padding-top:15px" data-bundle-css = "<?php echo asset_url( 'css/bundle.min.css' ); ?>" data-main-css = "<?php echo asset_url( 'css/main.css' ); ?>" >        
+								<thead class="thead-light">
+									<tr>
+										<?php foreach ( !empty( $table['cols_view'] ) ? $table['cols_view'] : $table['cols'] as $col) : ?>
+											<?php if (is_array($col)) : ?>
+												<?php foreach ($col as $sub_col) : ?>
+													<?php if ($sub_col == 'ID') : ?>
+														<th scope="col" style="display:none;"><?php echo $sub_col; ?></th>
+													<?php else : ?>
+														<th scope="col"><?php echo $sub_col; ?></th>
+													<?php endif; ?>
+												<?php endforeach; ?>
 											<?php else : ?>
-												<th scope="col"><?php echo $col; ?></th>
+												<?php if ($col == 'ID') : ?>
+													<th scope="col" style="display:none;"><?php echo $col; ?></th>
+												<?php else : ?>
+													<th scope="col"><?php echo $col; ?></th>
+												<?php endif; ?>
 											<?php endif; ?>
-										<?php endif; ?>
-									<?php endforeach; ?>
-									<th scope="col"></th>
-								</tr>
-							</thead>
-							<tbody>
-								<?php if (!empty($table['data'])) : foreach ($table['data'] as $data) : ?>
-										<tr>
-											<?php foreach (!empty( $table['cols_view'] ) ? $table['cols_view'] : $table['cols'] as $col_key => $col_name) : ?>
+										<?php endforeach; ?>
+										<!-- <th scope="col"></th> -->
+									</tr>
+								</thead>
+								<tbody>
+									<?php if (!empty($table['data'])) : foreach ($table['data'] as $data) : ?>
+											<tr>
+												<?php foreach (!empty( $table['cols_view'] ) ? $table['cols_view'] : $table['cols'] as $col_key => $col_name) : ?>
 
-												<?php if (is_array($col_name)) : ?>
-													<?php foreach ($col_name as $key => $value) : ?>
-														<?php if ($value == 'ID') : ?>
-														<td style="display:none;" scope="row" data-label="<?php echo $value; ?>">
+													<?php if (is_array($col_name)) : ?>
+														<?php foreach ($col_name as $key => $value) : ?>
+															<?php if ($value == 'ID') : ?>
+															<td style="display:none;" scope="row" data-label="<?php echo $value; ?>">
+																<?php echo $data[$col_key]; ?>
+															</td>
+															<?php else: ?>
+															<td scope="row" data-label="<?php echo $value; ?>">
+																<?php echo $data[$col_key]; ?>
+															</td>
+															<?php endif; ?>
+														<?php endforeach; ?>
+													<?php else : ?>
+														<?php if ($col_name == 'ID') : ?>
+														<td style="display:none;" scope="row" data-label="<?php echo $col_name; ?>">
 															<?php echo $data[$col_key]; ?>
-														</td>
+														</td>	
 														<?php else: ?>
-														<td scope="row" data-label="<?php echo $value; ?>">
+														<td scope="row" data-label="<?php echo $col_name; ?>">
 															<?php echo $data[$col_key]; ?>
 														</td>
 														<?php endif; ?>
-													<?php endforeach; ?>
-												<?php else : ?>
-													<?php if ($col_name == 'ID') : ?>
-													<td style="display:none;" scope="row" data-label="<?php echo $col_name; ?>">
-														<?php echo $data[$col_key]; ?>
-													</td>	
-													<?php else: ?>
-													<td scope="row" data-label="<?php echo $col_name; ?>">
-														<?php echo $data[$col_key]; ?>
-													</td>
 													<?php endif; ?>
-												<?php endif; ?>
-											<?php endforeach; ?>
+												<?php endforeach; ?>
 
+											</tr>
+										<?php endforeach;
+									else : ?>
+										<tr>
+											<td class="text-center" colspan="<?php echo count($table['cols']); ?>">Belum ada data.</td>
 										</tr>
-									<?php endforeach;
-								else : ?>
-									<tr>
-										<td class="text-center" colspan="<?php echo count($table['cols']); ?>">Belum ada data.</td>
-									</tr>
-								<?php endif; ?>
-							</tbody>
-						</table>
-					<?php endif; ?>
+									<?php endif; ?>
+								</tbody>
+							</table>
+						<?php endif; ?>
+					</div>
+				</div>
 				</div>
 				<?php
 				Flight::render('partials/pagination', array(

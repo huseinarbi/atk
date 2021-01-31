@@ -385,11 +385,6 @@ class ATK_Laporan {
                     'created_at'    => current_time( 'mysql' ),
                     'modified_at'   => current_time( 'mysql' )
                 );
-
-                // echo '<pre>';
-                // print_r($data);
-
-                // exit();
                 
                 $save_error_message	= $pdodb->updateData( array(
                     'table' 		=> 'laporan',
@@ -423,9 +418,7 @@ class ATK_Laporan {
             );
         }
  
-        echo '<pre>';
-        print_r($response);
-        exit();
+        Flight::json( $response );
         
 	}
 

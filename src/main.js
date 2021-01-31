@@ -50,23 +50,25 @@ class ATK {
     $(document).on( 'click', '#add-to-cart', this.addToCart );
     // $(document).on( 'click', '#add-to-cart', this.calculateTotal );
     $(document).on( 'change', '#jumlah-cart', this.changeTotal );
-    // $(document).addEventListener( 'keyup', '#jumlah-cart', function(e) {
+    $(document).on( 'keyup', '#jumlah-cart', function(e) {
       
       
-    //   let default_stok = $(this).attr('max');
-    //   console.log(e.target.value);
-    //   console.log(default_stok);
-    //   if (e.target.value > default_stok) {
-    //     Swal.fire({
-    //       icon    : 'error',
-    //       title   : 'Oops...',
-    //       text    : 'Stok barang sisa '+default_stok,
-    //     });
-    //     this.value = default_stok;
-    //   } else if (e.target.value.length && e.target.value <= 0) {
-    //     this.value = 1;
-    //   }
-    // });
+      let default_stok = $(this).attr('max');
+      let jumlah = e.target.value;
+
+      console.log(jumlah);
+      console.log(default_stok);
+      if ( parseInt(jumlah) > parseInt(default_stok)) {
+        Swal.fire({
+          icon    : 'error',
+          title   : 'Oops...',
+          text    : 'Stok barang sisa '+default_stok,
+        });
+        this.value = default_stok;
+      } else if (jumlah.length && jumlah <= 0) {
+        this.value = 1;
+      }
+    });
 
     $(document).on( 'change', '#harga-barang', this.changeTotal )
     $(document).on( 'click', '.remove-current-item', this.remove_current_item );
@@ -75,6 +77,7 @@ class ATK {
     $(document).on( 'click', '#save-tutup-buku', this.save_tutup_buku );
 
     $(document).on( 'change', '#date-periode-prediksi', this.changePeriode );
+    $(document).on( 'change', '#date-periode-tutup-buku', this.changePeriode );
     $(document).on( 'change', '#type-prediksi-option', this.changeTypePeriode );
 
     this.load_chart();
@@ -129,7 +132,26 @@ class ATK {
             },
           })
           .done(function(response) {
-            
+            if ( response.success == false ) {
+
+              Swal.fire({
+                icon    : 'error',
+                title   : 'Oops...',
+                text    : response.message,
+              });
+      
+            } else {
+              Swal.fire({
+                icon: 'success',
+                title: response.message,
+                showConfirmButton: false,
+                timer: 3000
+              });
+              
+              setTimeout(() => {
+                document.location.reload();
+              }, 2000);
+            }
           });    
       }
     })  
@@ -338,6 +360,16 @@ class ATK {
     default_number  = 1;
     default_harga   = $(this).closest('.list-item').data('harga-barang');
     default_stok    = $(this).closest('.list-item').data('stok-barang');
+
+    if ( default_stok <= 0 ) {
+      Swal.fire({
+        icon    : 'error',
+        title   : 'Oops...',
+        text    : 'Stok barang sisa '+default_stok,
+      });
+
+      return;
+    }
     
     jenis_transaksi  = $(document).find('#jenis_transaksi').val();
 
@@ -399,8 +431,8 @@ class ATK {
 
   documentPrint() {
     const d         = new Printd();
-    let bundle_css  = $(document).find('#table-prediksi').data('bundle-css');
-    let main_css    = $(document).find('#table-prediksi').data('main-css');
+    let bundle_css  = $(document).find('.print-container').data('bundle-css');
+    let main_css    = $(document).find('.print-container').data('main-css');
     
     const styles  = [
       bundle_css,
@@ -409,13 +441,32 @@ class ATK {
       '.section-title {backgroud:black}'
     ]
 
-    const el = document.getElementById('table-prediksi')
+    const el = $(document).find('.print-container');
     const printCallback = ({ launchPrint }) => launchPrint()
 
     d.print(el, styles, printCallback)
   }
 
-  viewDataTable() {
+  documentPrint() {
+    const d         = new Printd();
+    let bundle_css  = $(document).find('#table-print').data('bundle-css');
+    let main_css    = $(document).find('#table-print').data('main-css');
+    
+    const styles  = [
+      bundle_css,
+      main_css,
+      '.table thead{display:table-header-group}',
+      '.section-title {backgroud:black}'
+    ]
+
+    const el = document.getElementById('table-print')
+    const printCallback = ({ launchPrint }) => launchPrint()
+
+    d.print(el, styles, printCallback)
+  }
+
+
+  viewDataTableBackup() {
     let user_role = $(document).find('#user-role').data('role');
     let addButton = '<button id="btn-print" class="dt-button buttons-excel buttons-html5 btn btn-success">Print</button>';
 
@@ -453,6 +504,46 @@ class ATK {
       }
       $('.dt-buttons').append(addButton);
   }
+
+  viewDataTable() {
+    let user_role = $(document).find('#user-role').data('role');
+    let addButton = '<button id="btn-print" class="dt-button buttons-excel buttons-html5 btn btn-success">Print</button>';
+
+    if (user_role == 'siswa') {
+      return;
+    }
+      if( $.fn.DataTable ){
+        var rapor_title = $('.table-data-table').attr('data-title');
+        $('.table-data-table').DataTable({ 
+          fnDrawCallback: function( settings ){
+            if( this.api().page.info().pages === 1 ){
+              $('.table-data-table_paginate').hide();
+            } else {
+              $('.table-data-table_paginate').show();
+            }
+          },
+         
+          dom: 'Bfrtip', // multiple
+          buttons: [
+            {
+              extend: 'excel',
+              title: rapor_title,
+            }
+          ],
+         
+        searching: false, 
+        info: false,
+        paging: false,  
+        order : []
+        });
+        $(document).find( '.dt-button' ).addClass( 'btn btn-success' );
+        
+      } else {
+        console.log( 'DataTable is not function.');
+      }
+      $('.dt-buttons').append(addButton);
+  }
+
   deleteMengajar() {
     let container_target  = $(this);
     let $id_mapel         = container_target.data('mapel-id');

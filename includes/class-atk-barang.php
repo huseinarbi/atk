@@ -716,13 +716,9 @@ class ATK_Barang {
 						'harga_barang'	=> $harga_satuan[$key],
 					);
 
-					if ( ! $this->check_laporan( $jenis_transaksi, $id_barang[$key], date("Y-m", strtotime( current_time( 'mysql' ) ) ) ) ) {
-						throw new Exception( 'Belum Tutup Buku Bulan Sebelumnya' );
-					}
-
-					// echo '<pre>';
-					// print_r(array_merge( $update_data, $modified_at ));
-					// exit();
+					// if ( ! $this->check_laporan( $jenis_transaksi, $id_barang[$key], date("Y-m", strtotime( current_time( 'mysql' ) ) ) ) ) {
+					// 	throw new Exception( 'Belum Tutup Buku Bulan Sebelumnya' );
+					// }
 
 					$save_error_message	= $pdodb->saveData( array(
 						'table' 		=> 'barang',
@@ -739,7 +735,7 @@ class ATK_Barang {
 					));
 				}
 	
-				if ( ! empty( $save_error_message ) ) {
+				if ( ! empty( $save_error_message['error'] ) ) {
 	
 					throw new Exception( $save_error_message );
 					

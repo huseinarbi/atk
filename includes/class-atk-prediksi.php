@@ -69,6 +69,10 @@ class ATK_Prediksi {
         $final_ = $this->get_pengambilan_data_view( $group, $periode_bulan );
         $final_ = $this->get_prediction( $final_ );
 
+        // echo '<pre>';
+        // print_r($final_);
+        // exit();
+
         foreach ( $final_ as $id_barang => $value ) {
 
             foreach ( $value as $key => $last ) {
