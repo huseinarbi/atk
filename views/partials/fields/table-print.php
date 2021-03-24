@@ -7,9 +7,8 @@ if ( isset( $_REQUEST ) && ! empty( $_REQUEST ) ) {
 ?>
 <div id="<?php echo isset($id) ? $id : 'form-table-part' ?>" class="col-lg-12">
     <div class="form-group">
-        <table id="<?php echo $table_id; ?>"" class="table align-items-center table-flush responsive" style="width:100%; padding-top:15px">
-                    
-        <thead>
+        <table id="table-print" class="table align-items-center table-flush responsive table-data-table" style="width:100%; padding-top:15px" data-bundle-css = "<?php echo asset_url( 'css/bundle.min.css' ); ?>" data-main-css = "<?php echo asset_url( 'css/main.css' ); ?>" >        
+        <thead class = "headerTable">
             <tr>
                 <?php foreach( $fields as $field ) : ?>
                     <th> <?php echo ucwords(str_replace('_',' ', $field)); ?></th>

@@ -27,7 +27,7 @@
 				<div class="header-body text-center mb-5">
 					<div class="row justify-content-center">
 						<div class="col-lg-5 col-md-6">
-							<h1 class="text-white">Aplikasi Pengelolaan<br>Alat Tulis Kantor<br>BPJS Ketenagakerjaan Magelang</h1>
+							<h1 class="text-white">Aplikasi Peramalan Pengadaan<br>Alat Tulis Kantor<br>Dengan Metode Regresi Linear<br>BPJS Ketenagakerjaan Magelang</h1>
 							<p class="text-lead text-light">Silahkan masukkan username dan password anda untuk masuk aplikasi.</p>
 						</div>
 					</div>
