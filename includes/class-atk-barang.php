@@ -49,20 +49,20 @@ class ATK_Barang {
 			'heading' 	=> 'Data Barang',
 			'base_url' 	=> get_url('barang'),
 			'more_btn' 	=> array(
-				'button1' 	=> array(
-					'title' 	=> 'Detail',
-					'url' 		=> 'detail',
-					'action' 	=> 'view'
-				)
+				// 'button1' 	=> array(
+				// 	'title' 	=> 'Detail',
+				// 	'url' 		=> 'detail',
+				// 	'action' 	=> 'view'
+				// )
 			),
 			'add'  		=> 'Tambah Barang',
-			// 'btn_download'	=> array(
-			// 	array(
-			// 		'string'	=> 'Template Barang',
-			// 		'id'		=> 'download_barang',
-			// 		'url'		=> 'uploads/Template_Barang.xlsx'
-			// 	)
-			// ),
+			'btn_download'	=> array(
+				array(
+					'string'	=> 'Template Barang',
+					'id'		=> 'download_barang',
+					'url'		=> 'uploads/Template_Import.xlsx'
+				)
+			),
 			'table' 	=> $pdodb->getTableData(array(
 				'cols'  => $cols,
 				'page'  => $page,
