@@ -2,6 +2,7 @@
 <div class="container-fluid mt--7">
 	<div class="header-body">
 		<!-- Card stats -->
+		<div>Haloo</div>
 		<div class="row">
 			<!-- Card -->
 			<?php if (isset($card_view)) : foreach ($card_view as $key => $card) : ?>
