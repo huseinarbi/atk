@@ -23,6 +23,6 @@
   "dependencies": {
     "chart.js": "^2.9.4",
     "printd": "^1.4.1",
-    "xlsx": "^0.15.5"
+    "xlsx": "^0.17.0"
   }
 }
